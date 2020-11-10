@@ -1,0 +1,105 @@
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  font-family: 'Ancizar';
+  color: #071A52;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+/*
+  GLOBAL CSS
+*/
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Ancizar';
+  font-weight: 400;
+}
+
+.margin-bottom {
+  margin-bottom: 15px;
+}
+
+.margin-top {
+  margin-top: 15px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+}
+
+.with-shadow {
+  -webkit-box-shadow: 0px 5px 8px 0px rgba(153,153,153,1);
+  -moz-box-shadow: 0px 5px 8px 0px rgba(153,153,153,1);
+  box-shadow: 0px 5px 8px 0px rgba(153,153,153,1);
+}
+
+.popover-content {
+  border: 1px #E6E8ED solid;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 15px 10px 15px;
+}
+
+textarea {
+  resize: none;
+}
+/*
+  FONT IMPORTS
+*/
+
+
+@font-face {
+  font-family: 'Ancizar';
+  font-style: normal;
+  font-weight: 300;
+  src: url(./assets/fonts/ancizar/Ancizar-Sans-Light-300.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'Ancizar';
+  font-style: normal;
+  font-weight: 400;
+  src: url(./assets/fonts/ancizar/Ancizar-Sans-Regular-400.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'Ancizar';
+  font-style: italic;
+  font-weight: 400;
+  src: url(./assets/fonts/ancizar/Ancizar-Sans-Regular-400-I.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'Ancizar';
+  font-style: normal;
+  font-weight: 700;
+  src: url(./assets/fonts/ancizar/Ancizar-Sans-Bold-700.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'Ancizar';
+  font-style: normal;
+  font-weight: 800;
+  src: url(./assets/fonts/ancizar/Ancizar-Sans-Extrabold-800.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'Ancizar';
+  font-style: normal;
+  font-weight: 900;
+  src: url(./assets/fonts/ancizar/Ancizar-Sans-Black-900.otf) format('opentype');
+}

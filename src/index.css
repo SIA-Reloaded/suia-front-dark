@@ -27,6 +27,11 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
 }
 
+p {
+  font-family: 'Ancizar';
+  font-weight: 400;
+}
+
 .margin-bottom {
   margin-bottom: 15px;
 }
@@ -102,4 +107,30 @@ textarea {
   font-style: normal;
   font-weight: 900;
   src: url(./assets/fonts/ancizar/Ancizar-Sans-Black-900.otf) format('opentype');
+}
+
+
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
 }

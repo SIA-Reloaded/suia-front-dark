@@ -20,7 +20,7 @@ const StyledButton = styled.button`
 
     i {
       font-size: 20px;
-      margin-left: 10px;
+      margin-right: 10px;
     }
   `}
 

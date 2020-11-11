@@ -1,13 +1,10 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import styled from 'styled-components';
-import MainMenu from '../components/main-menu'
-import Customer from './customer';
-import CustomerLoans from './customer-loans';
-import FailedPayments from './failed-payments';
-import Loans from './loans';
-import ProspectCustomer from './prospect-customer';
-import Reports from './reports';
+import SideBar from '../components/sidebar'
+import Groups from './groups';
+import Request from './requests';
+import CreateGroup from './create-group';
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -17,14 +14,13 @@ const DashboardContainer = styled.div`
 `
 
 const Dashboard = (props) => {
+  console.log(props)
+  console.log(props.match.url + "/crear-grupo")
   return <DashboardContainer>
-    <MainMenu {...props}/>
-    <Route path={props.match.url + "/prospect-customer"} component={ProspectCustomer} />
-    <Route path={props.match.url + "/customer"} component={Customer} />
-    <Route path={props.match.url + "/customer-loans"} component={CustomerLoans} />
-    <Route path={props.match.url + "/loans"} component={Loans} />
-    <Route path={props.match.url + "/failed-payments"} component={FailedPayments} />
-    <Route path={props.match.url + "/reports"} component={Reports} />
+    <SideBar {...props}/>
+    <Route path={props.match.url + "/solicitudes"} component={Request} />
+    <Route path={props.match.url + "/grupos"} component={Groups} />
+    <Route exact path={props.match.url + "/grupos/crear-grupo"} component={CreateGroup} />
   </DashboardContainer>
 }
 

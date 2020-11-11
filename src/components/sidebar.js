@@ -7,14 +7,14 @@ const MainMenuContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 300px;
-  padding: 50px 12px 0px 50px;
+  padding: 20px 12px 0px 50px;
   width: 300px;
 
 `
 
 const StyledLink = styled(Link)`
   align-items: center;
-  color: white;
+  color: ${(props) => props.theme.colors.gray[1]};
   display: flex;
   padding: 15px 0 15px 20px;
   text-decoration: none;
@@ -24,44 +24,32 @@ const StyledLink = styled(Link)`
     margin-right: 10px;
   }
 
-  ${(props) => {
-    
-  }}
+  &.active {
+    border-radius: ${(props) => props.theme.universalBorderRadius};
+    background-color: ${(props) => props.theme.colors.gray[5]};
+    color: ${(props) => props.theme.colors.gray[0]};
+  }
+
 `;
 
 
 
-const MainMenu = (props) => {
-  return <MainMenuContainer>
-    <StyledLink to={props.match.url + '/prospect-customer'}>
-    <i className="material-icons-round">star_border</i>
-      Prospect Customer
-    </StyledLink>
-    <StyledLink to={props.match.url + '/customer'}>
-      <i className="material-icons-round">perm_identity</i>
-      Customers
-    </StyledLink>
-    <StyledLink to={props.match.url + '/loans'}>
-      <i className="material-icons-round">payment</i>
-      Loans
-    </StyledLink>
-    <StyledLink to={props.match.url + '/customer-loans'}>
-      <i className="material-icons-round">local_atm</i>
-      Customer Loans
-    </StyledLink>
-    <StyledLink to={props.match.url + '/failed-payments'}>
-      <i className="material-icons-round">report</i>
-      Failed Payments
-    </StyledLink>
-    <StyledLink to={props.match.url + '/reports'}>
-      <i className="material-icons-round">plagiarism</i>
-      Reports
-    </StyledLink>
-    <StyledLink to={props.match.url + '/manage-team'}>
-      <i className="material-icons-round">groups</i>
-      Manage Team
-    </StyledLink>
-  </MainMenuContainer>
-  
+const SideBar = (props) => {
+  const buildAdminSideBar = () => {
+    return <MainMenuContainer>
+      <h3>Servicios admin</h3>
+      <StyledLink className={props.location.pathname === '/dashboard/solicitudes' ? 'active' : ''} to={props.match.url + '/solicitudes'}>
+        <i className="material-icons-round">question_answer</i>
+        Solicitudes
+      </StyledLink>
+      <StyledLink  className={props.location.pathname === '/dashboard/grupos' ? 'active' : ''} to={props.match.url + '/grupos'}>
+        <i className="material-icons-round">group_work</i>
+        Grupos
+      </StyledLink>
+    </MainMenuContainer>
+  }
+
+  return buildAdminSideBar()
 }
 
+export default SideBar;

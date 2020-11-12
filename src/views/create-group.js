@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Input from "../components/input";
 import Button from "../components/button.js";
 import GroupModel from "../models/group";
+import { createGroup } from "../utilities/aws-helper";
 
 const CreateGroupLayout = styled.div`
   display: flex;
@@ -61,7 +62,7 @@ const CreateGroup = (props) => {
     { day: "", startHours: "", endHours: "" },
   ]);
 
-  const saveGroup = () => {
+  const saveGroup = async () => {
     const group = new GroupModel(
       null,
       courseName,
@@ -78,6 +79,7 @@ const CreateGroup = (props) => {
       [],
       null
     );
+    console.log(await createGroup(group));
   };
 
   const onSessionChange = (e) => {
@@ -196,7 +198,9 @@ const CreateGroup = (props) => {
       </FormContainer>
       <div class="actions">
         <Button>Cancelar</Button>
-        <Button solid>Crear grupo</Button>
+        <Button solid onClick={saveGroup}>
+          Crear grupo
+        </Button>
       </div>
     </CreateGroupLayout>
   );

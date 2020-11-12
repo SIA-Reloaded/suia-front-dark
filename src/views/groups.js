@@ -4,7 +4,8 @@ import { Redirect } from 'react-router-dom';
 import SectionContainer from '../components/dashboard-section';
 import { SearchInput } from '../components/input';
 import Button from '../components/button';
-import GroupModel from '../models/group'
+
+import * as awsHelper from '../utilities/aws-helper';
 
 const GroupsLayout = styled.div`
   display: flex;
@@ -27,36 +28,14 @@ const GroupsTable = styled.table`
 
 const Groups = (props) => {
   const [mustNavigate, setMustNavigate] = React.useState(false)
-  const [rows, setRows] = React.useState([new GroupModel(
-    12324,
-    "Ingeniaría de software 1",
-    "202011",
-    {
-      "fundametation": 5,
-      "disciplinaryObligatory": 28
-    },
-    3,
-    [
-      {
-        "day": "MO",
-        "startHours": "16:00",
-        "endHours": "18:00"
-      },
-      {
-        "day": "WE",
-        "startHours": "16:00",
-        "endHours": "18:00"
-      }
-    ],
-    "El viejo - salón 401",
-    [],
-    { name: "Alejandro Díaz", id: "123344324123412" }
-  )])
+  const [courseCode, setCourseCode] = React.useState(false)
+  const [rows, setRows] = React.useState([])
 
-  useEffect(() => {
-    
-  });
-
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const rows = awsHelper.getGroups(courseCode);
+    console.log(rows);
+  }
 
   const onCreateGroupClick = () => {
     setMustNavigate(true)
@@ -74,10 +53,11 @@ const Groups = (props) => {
 
   return <SectionContainer>
     <GroupsLayout>
-      <div>
+      <form onSubmit={handleSubmit}>
+
         <SearchInput onChange={handleCourseNameChange} width='300px' placeholder='Busca por nombre de materia' />
         <SearchInput onChange={handleCourseCodeChange} placeholder='Busca por código' />
-      </div>
+      </form>
       <Button withIcon solid onClick={onCreateGroupClick}>
         <i className="material-icons-round">add</i>
         Nuevo grupo

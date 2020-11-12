@@ -14,12 +14,10 @@ const DashboardContainer = styled.div`
 `
 
 const Dashboard = (props) => {
-  console.log(props)
-  console.log(props.match.url + "/crear-grupo")
   return <DashboardContainer>
     <SideBar {...props}/>
-    <Route path={props.match.url + "/solicitudes"} component={Request} />
-    <Route path={props.match.url + "/grupos"} component={Groups} />
+    <Route exact path={props.match.url + "/solicitudes"} component={Request} />
+    <Route exact path={props.match.url + "/grupos"} component={Groups} />
     <Route exact path={props.match.url + "/grupos/crear-grupo"} component={CreateGroup} />
   </DashboardContainer>
 }

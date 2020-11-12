@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import SectionContainer from '../components/dashboard-section';
 import { SearchInput } from '../components/input';
 import Button from '../components/button';
@@ -15,6 +15,7 @@ const GroupsLayout = styled.div`
 
 const GroupsTable = styled.table`
   width: 100%;
+  text-align: center;
 
   tr {
     td {
@@ -91,15 +92,12 @@ const Groups = (props) => {
         </tr>
       </thead>
       <tbody>
-          {rows.map((row) => {
-        return (
-          <tr>
-            {row.rowRepresentation.map((data) => (
-              <td key={data}>{data}</td>
-            ))}
-          </tr>
-        );
-      })}
+      {rows.map(row => {
+          return <tr>
+              {row.rowRepresentation.map((data) => <td key={data} >{data}</td>)}
+              <td><Link to={props.match.url + '/detalle'}>Ver</Link></td>
+            </tr>
+        })}
       </tbody>
     </GroupsTable>
   </SectionContainer>

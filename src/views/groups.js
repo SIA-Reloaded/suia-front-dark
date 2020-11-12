@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect} from 'react';
 import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
 import SectionContainer from '../components/dashboard-section';
@@ -52,6 +52,11 @@ const Groups = (props) => {
     [],
     { name: "Alejandro Díaz", id: "123344324123412" }
   )])
+
+  useEffect(() => {
+    
+  });
+
 
   const onCreateGroupClick = () => {
     setMustNavigate(true)

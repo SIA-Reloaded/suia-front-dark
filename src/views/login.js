@@ -7,8 +7,6 @@ import Button from '../components/button';
 import IMAGES from '../assets/images/images';
 import * as awsHelper from '../utilities/aws-helper';
 
-import "firebase/auth";
-import "firebase/firestore";
 import { Redirect } from 'react-router';
 
 const LoginContainer = styled.div`
@@ -40,7 +38,7 @@ const Login = (props) => {
 
   useEffect(() => {
     const user = window.firebase.auth().currentUser
-    if (user) getUserData(window.firebase.auth().currentUser.email.split('@')[0])
+    //if (user) getUserData(window.firebase.auth().currentUser.email.split('@')[0])
   });
 
   
@@ -61,7 +59,7 @@ const Login = (props) => {
     });
 
     const username = credentials.email.split('@')[0];
-    getUserData(username)
+    //getUserData(username)
   }
 
   const getUserData = async (username) => {

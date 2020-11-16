@@ -29,7 +29,6 @@ function App(props) {
   useEffect(() => {
     if (user) getUserData(window.firebase.auth().currentUser.email.split('@')[0])
   }, [user]);
-  
 
   const getUserData = async (username) => {
     const user = await awsHelper.getUserData(username)
@@ -38,9 +37,6 @@ function App(props) {
     };
   } 
 
-  console.log(props)
-  console.log(user)
-  
   // User hasn't been retrieved from Firebase auth
   if(user === undefined && props.location.pathname !== '/login') {
     return <ThemeProvider theme={theme}>
@@ -51,14 +47,12 @@ function App(props) {
   // No user logged
   if(user === null && props.location.pathname !== '/login') return <Redirect to='/login' />
 
-  console.log("props")
-  
-
   // User logged
   return (
     <ThemeProvider theme={theme}>
       {/* Header Swich*/}
       <Switch>
+        <Route exact path='/login' render={() => null}/>
         <Route render={(props) => (<Header user={userData} {...props} />)} />
       </Switch>
       {/* Content Swich*/}

@@ -1,23 +1,24 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import SectionContainer from '../components/section-container';
 import Input from '../components/input';
 import Button from '../components/button';
 
 import IMAGES from '../assets/images/images';
-import * as awsHelper from '../utilities/aws-helper';
 
 import { Redirect } from 'react-router';
+import { CenteredLoader } from '../components/loader';
 
 const LoginContainer = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   height: 100%;
-  padding-top: 200px;
 
   h2 {
     color: ${(props) => props.theme.colors.gray[2]};
+
+    margin-bottom: 100px;
   }
 
   form {
@@ -32,16 +33,10 @@ const LoginContainer = styled.div`
 
 `
 
-const Login = (props) => {
+const Login = () => {
   const [credentials, setCredentials] = React.useState({})
+  const [isLoading, setIsLoading] = React.useState(false)
   const [mustNavigate, setMustNavigate] = React.useState(false)
-
-  useEffect(() => {
-    const user = window.firebase.auth().currentUser
-    //if (user) getUserData(window.firebase.auth().currentUser.email.split('@')[0])
-  });
-
-  
 
   const handleInputChange = (event) => {
     let newCredentials = { ...credentials }
@@ -51,49 +46,43 @@ const Login = (props) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    
-    window.firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password).catch(function(error) {
+    setIsLoading(true)
+
+    const result = await window.firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password).catch(function (error) {
       console.log(error)
       alert("user not found")
       return
     });
 
-    const username = credentials.email.split('@')[0];
-    //getUserData(username)
+    if (result) { // User logged in succesfuly
+      setMustNavigate(true)
+    }
   }
 
-  const getUserData = async (username) => {
-    const user = await awsHelper.getUserData(username)
-    if (user) {
-      props.setUserData(user)
-      setMustNavigate(true)
-    };
-  } 
+  if (mustNavigate) return <Redirect push to='/dashboard' />
 
-  if (mustNavigate) return <Redirect to='/dashboard'/>
+  if (isLoading) return CenteredLoader({ height: '100%' })
 
-  return <SectionContainer>
-    <LoginContainer>
-      <img src={IMAGES.UNAL_LOGO} alt='Universidad Nacional de Colombia' />
-      <h2>
-        Sistema <b>Unificado</b> de información <b>académica </b>
-        <span>Universidad Nacional de Colombia</span>
-      </h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Usuario:
+  return <LoginContainer>
+    <img src={IMAGES.UNAL_LOGO} alt='Universidad Nacional de Colombia' />
+    <h2>
+      Sistema <b>Unificado</b> de información <b>académica </b>
+      <span>Universidad Nacional de Colombia</span>
+    </h2>
+    <form onSubmit={handleSubmit}>
+      <label>
+        Usuario:
           <Input className='margin-bottom' type='text' name='email' onChange={handleInputChange} placeholder='jjdive' required />
-        </label>
-        <label className='margin-bottom'>
-          Password:
+      </label>
+      <label className='margin-bottom'>
+        Password:
           <Input className='margin-bottom' type='password' name='password' onChange={handleInputChange} placeholder='Password' required />
-        </label>
-        <Button type="submit" solid>
-          Iniciar Sesión
+      </label>
+      <Button type="submit" solid>
+        Iniciar Sesión
         </Button>
-      </form>
-    </LoginContainer>
-  </SectionContainer>
+    </form>
+  </LoginContainer>
 }
 
 export default Login;

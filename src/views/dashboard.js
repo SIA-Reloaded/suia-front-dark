@@ -6,7 +6,8 @@ import Groups from './groups';
 import Request from './requests';
 import CreateGroup from './create-group';
 import GroupDetails from './group-details';
-import CalificacionDocente from './calificacion-docente'
+import CalificacionDocente from './calificacion-docente';
+
 
 const DashboardContainer = styled.div`
   display: flex;

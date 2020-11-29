@@ -13,62 +13,86 @@ const Layout = styled.div`
 
 const CalificacionDocente = () => {
 
-    const [cleanedSemesters, setCleanedSemesters] = React.useState([]);
-    const [cleanedMaterias, setCleanedMateria] = React.useState([]);
-    // rateList
+  const [cleanedSemesters, setCleanedSemesters] = React.useState([]);
+  const [cleanedMaterias, setCleanedMateria] = React.useState([]);
+  const [semesterState, setSemesterState] = React.useState("");
+  // rateList
 
-    const getSemesters = async () => {
-        const rates = await awsHelper.getRates("20");
-        const academicCalendars = rates.map(
-            (rate) => {
-                return rate.academicCalendar;
-            }
-        );
+  const getSemesters = async () => {
+    const rates = await awsHelper.getRates("20");
+    const academicCalendars = rates.map(
+      (rate) => {
+        return rate.academicCalendar;
+      }
+    ); 
 
-        const semesters = await awsHelper.getSemestersList();
-        setCleanedSemesters(
-            semesters.filter(
-                (semester) => {
-                    return academicCalendars.includes(semester.id)
-                }
-            )
-        )
-    }
+    const semesters = await awsHelper.getSemestersList();
+    const filteredSemesters = semesters.filter(
+      (semester) => {
+        return academicCalendars.includes(semester.id)
+      }
+    )
+    console.log(filteredSemesters)
+    setCleanedSemesters(filteredSemesters)
+    setSemesterState(filteredSemesters[0])
+  }
 
 
-    const changeCourses = async () => {}
-
-    React.useEffect(
-        () => {
-            getSemesters();
+  const changeCourses = async () => {
+    const rates = await awsHelper.getRates("20");
+    setCleanedMateria(
+      rates.map(
+        (rateCourse) => {
+          return rateCourse.courseID;
         }
-    );
-    
-    
-    return <div>
-        <Layout >
-            <Layout columns>
-                <h3>Semestre</h3>
-                <Dropdown width="150px">
-                {
-                    cleanedSemesters.map(
-                        (cleanedSemesterList) =>
-                        <option key={cleanedSemesterList.id}>{`${cleanedSemesterList.year}-${cleanedSemesterList.period}`}</option>
-                    )
-                }
-                </Dropdown>
-            </Layout>
-            <Layout columns>
-                <h3>Asignatura</h3>
-                <Dropdown width="200px">
-                {
-                    
-                }
-                </Dropdown>
-            </Layout>
+      )
+    )
+  }
 
-        </Layout>
-    </div>
+  React.useEffect(
+    () => {
+      getSemesters();
+      changeCourses();
+    }, []
+  );
+
+  const semestre = (e) => {
+    const selectedSemester = e.target.key;
+    console.log(e.target.key);
+    console.log(e.target.value);
+    setSemesterState(selectedSemester);
+  }
+  console.log(semesterState)
+  return <div>
+    <Layout >
+      <Layout columns>
+        <h3>Semestre</h3>
+        <Dropdown
+          width="150px"
+          onChange={semestre}
+        >
+          {
+            cleanedSemesters.map(
+              (cleanedSemesterList) =>
+                <option key={cleanedSemesterList.id}>{`${cleanedSemesterList.year}-${cleanedSemesterList.period}`}</option>
+            
+                )
+
+          }
+
+        </Dropdown>
+      </Layout>
+      <Layout columns>
+        <h3>Asignatura</h3>
+        <Dropdown width="200px">
+          {
+
+          }
+        </Dropdown>
+      </Layout>
+
+    </Layout>
+  </div>
 }
 
 export default CalificacionDocente

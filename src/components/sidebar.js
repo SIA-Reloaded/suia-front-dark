@@ -42,9 +42,13 @@ const SideBar = (props) => {
         <i className="material-icons-round">question_answer</i>
         Solicitudes
       </StyledLink>
-      <StyledLink  className={props.location.pathname === '/dashboard/grupos' ? 'active' : ''} to={props.match.url + '/grupos'}>
+      <StyledLink className={props.location.pathname === '/dashboard/grupos' ? 'active' : ''} to={props.match.url + '/grupos'}>
         <i className="material-icons-round">group_work</i>
         Grupos
+      </StyledLink>
+      <StyledLink className={props.location.pathname === '/dashboard/calificacion-docente' ? 'active' : ''} to={props.match.url + '/calificacion-docente'}>
+        <i className="material-icons-round">group_work</i>
+        Calificacion Docente
       </StyledLink>
     </MainMenuContainer>
   }

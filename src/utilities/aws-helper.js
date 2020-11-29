@@ -23,5 +23,5 @@ export const createGroup = async (group) => {
     }
   );
   return await response.json();
-};
+}; 
 

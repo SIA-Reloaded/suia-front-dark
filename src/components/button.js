@@ -23,6 +23,7 @@ const StyledButton = styled.button`
 
       i {
         font-size: 20px;
+        margin: 0;
         margin-right: 10px;
       }
     `}

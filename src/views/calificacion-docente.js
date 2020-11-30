@@ -16,6 +16,7 @@ const CalificacionDocente = () => {
   const [cleanedSemesters, setCleanedSemesters] = React.useState([]);
   const [cleanedMaterias, setCleanedMateria] = React.useState([]);
   const [semesterState, setSemesterState] = React.useState("");
+  const [nameCourses, setNameCourses] = React.useState([]);
   // rateList
 
   const getSemesters = async () => {
@@ -38,28 +39,39 @@ const CalificacionDocente = () => {
   }
 
 
-  const changeCourses = async () => {
+  const loadCoursesId = async () => {
     const rates = await awsHelper.getRates("20");
     
     const semesterCourses = rates.filter(
       (rate)=> rate.academicCalendar === semesterState.id
     );
     
-    const courses = semesterCourses.map(
+    const courses = semesterCourses.map( 
         (course) => {
           return course.courseID;
         }
       )
-  
     setCleanedMateria(courses);
   }
 
+  const courses = async () => {
+   // const courses = await awsHelper.getGroup("0fa0cce0-25ef-11eb-9c41-7b8105682f18");
+  const coursesPromise = cleanedMaterias.map(
+    (course) => {
+      return awsHelper.getGroup(course);
+    } 
+  ); 
 
+  const courses = await Promise.all(coursesPromise);
+    console.log(courses)
+    setNameCourses(courses);
+  }
 
   React.useEffect(
     () => {
       getSemesters();
-      changeCourses();
+      loadCoursesId();
+      courses();
     }, []
   );
 
@@ -67,8 +79,10 @@ const CalificacionDocente = () => {
     const selectedSemester = e.target.key;
     setSemesterState(selectedSemester);
   }
+
   console.log(semesterState.id)
   console.log(cleanedMaterias)
+
 
   return <div>
     <Layout >
@@ -86,14 +100,16 @@ const CalificacionDocente = () => {
           }
 
         </Dropdown>
-
       </Layout>
       <Layout columns>
         <h3>Asignatura</h3>
         <Dropdown width="200px">
-          {
-
-          }
+        {
+          nameCourses.map(
+            (cleanedCoursesList) =>
+              <option key={cleanedCoursesList.id}>{`${cleanedCoursesList.name}`}</option>         
+              )
+        }
         </Dropdown>
       </Layout>
 

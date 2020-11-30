@@ -32,7 +32,7 @@ const CalificacionDocente = () => {
         return academicCalendars.includes(semester.id)
       }
     )
-    console.log(filteredSemesters)
+    /*console.log(filteredSemesters)*/
     setCleanedSemesters(filteredSemesters)
     setSemesterState(filteredSemesters[0])
   }
@@ -40,14 +40,21 @@ const CalificacionDocente = () => {
 
   const changeCourses = async () => {
     const rates = await awsHelper.getRates("20");
-    setCleanedMateria(
-      rates.map(
-        (rateCourse) => {
-          return rateCourse.courseID;
+    
+    const semesterCourses = rates.filter(
+      (rate)=> rate.academicCalendar === semesterState.id
+    );
+    
+    const courses = semesterCourses.map(
+        (course) => {
+          return course.courseID;
         }
       )
-    )
+  
+    setCleanedMateria(courses);
   }
+
+
 
   React.useEffect(
     () => {
@@ -58,11 +65,11 @@ const CalificacionDocente = () => {
 
   const semestre = (e) => {
     const selectedSemester = e.target.key;
-    console.log(e.target.key);
-    console.log(e.target.value);
     setSemesterState(selectedSemester);
   }
-  console.log(semesterState)
+  console.log(semesterState.id)
+  console.log(cleanedMaterias)
+
   return <div>
     <Layout >
       <Layout columns>
@@ -74,13 +81,12 @@ const CalificacionDocente = () => {
           {
             cleanedSemesters.map(
               (cleanedSemesterList) =>
-                <option key={cleanedSemesterList.id}>{`${cleanedSemesterList.year}-${cleanedSemesterList.period}`}</option>
-            
+                <option key={cleanedSemesterList.id}>{`${cleanedSemesterList.year}-${cleanedSemesterList.period}`}</option>         
                 )
-
           }
 
         </Dropdown>
+
       </Layout>
       <Layout columns>
         <h3>Asignatura</h3>

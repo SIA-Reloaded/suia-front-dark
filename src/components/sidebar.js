@@ -47,7 +47,7 @@ const SideBar = (props) => {
         Grupos
       </StyledLink>
       <StyledLink className={props.location.pathname === '/dashboard/calificacion-docente' ? 'active' : ''} to={props.match.url + '/calificacion-docente'}>
-        <i className="material-icons-round">group_work</i>
+        <i className="material-icons-round">stars</i>
         Calificacion Docente
       </StyledLink>
     </MainMenuContainer>

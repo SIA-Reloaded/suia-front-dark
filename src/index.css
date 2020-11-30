@@ -59,6 +59,12 @@ label {
   padding: 10px 15px 10px 15px;
 }
 
+.modal-actions {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
 textarea {
   resize: none;
 }

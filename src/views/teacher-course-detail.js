@@ -2,8 +2,21 @@ import React from "react";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import Button from "../components/button";
+import Input from "../components/input";
 import * as awsHelper from "../utilities/aws-helper";
 import { parseDate, parseShedule } from "../utilities/date-helper";
+import Modal from 'react-modal';
+
+const ModalStyles = {
+  content : {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)'
+  }
+};
 
 const TeacherCourseDetailContainer = styled.div`
   width: 100%;
@@ -46,6 +59,15 @@ const TeacherCourseDetailBody = styled.div`
   .data {
     margin: 0.5em 0.5em 2em 0.5em;
     font-size: 1.2em;
+    tr {
+      display:flex;
+      td {
+        padding-right: 5px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+    }
   }
 `;
 
@@ -112,6 +134,19 @@ const TeacherCourseDetail = (props) => {
   const [course, setCourse] = React.useState(undefined);
   const [teacher, setTeacher] = React.useState(undefined);
   const [loading, setLoading] = React.useState(false);
+  const [downloadTemplateModalIsOpen,setDownloadTemplateIsOpen] = React.useState(false);
+  const [gradeItems, setGradeItems] = React.useState([
+    { name: "", percentage: 0 },
+  ]);
+  const [students, setStudents] = React.useState(undefined);
+
+  function openDownloadTemplateModal() {
+    setDownloadTemplateIsOpen(true);
+  }
+
+  function closeDownloadTemplateModal(){
+    setDownloadTemplateIsOpen(false);
+  }
 
   React.useEffect(
     () => {
@@ -123,6 +158,9 @@ const TeacherCourseDetail = (props) => {
   React.useEffect(
     () => {
       setLoading(false);
+      if (course) {
+        getStudents();
+      }
     },
     [course]
   );
@@ -133,12 +171,36 @@ const TeacherCourseDetail = (props) => {
     setCourse(courseResponse);
   }
 
+  const getStudents = async () => {
+    const studentsPromises = course.students.map(
+      (student) => awsHelper.getUserData(student)
+    );
+    Promise.all(studentsPromises)
+      .then(
+        (studentsInfo) => {
+          setStudents(
+            studentsInfo
+          )
+        }
+      )
+  }
+
+  const onItemChange = (e) => {
+    setGradeItems((oldItems) => {
+      const itemId = parseInt(e.target.name.split("-")[2]);
+      const itemKey = e.target.name.split("-")[1];
+      const newItes = [...oldItems];
+      newItes[itemId][itemKey] = e.target.value;
+      return newItes;
+    });
+  };
+
   return <TeacherCourseDetailContainer>
     { !course &&
-        <TeacherCourseDetailHeader>
-          <h2>Cargando...</h2>
-        </TeacherCourseDetailHeader>
-      }
+      <TeacherCourseDetailHeader>
+        <h2>Cargando...</h2>
+      </TeacherCourseDetailHeader>
+    }
     { course &&
       <div className="wrapper">
         <TeacherCourseDetailHeader>
@@ -150,27 +212,27 @@ const TeacherCourseDetail = (props) => {
             <p>Actualizado el {parseDate(course.update_datetime)}</p>
           </div>
         </TeacherCourseDetailHeader>
-    <TeacherCourseDetailBody>
-      <TeacherCourseGrades>
-          <div>
-            <h3>Notas:</h3>
-            <p>Actualizado el {parseDate(course.update_datetime)}</p>
-          </div>
-          <div className="actions">
+        <TeacherCourseDetailBody>
+          <TeacherCourseGrades>
+              <div>
+                <h3>Notas:</h3>
+                <p>Actualizado el {parseDate(course.update_datetime)}</p>
+              </div>
+              <div className="actions">
                 <Button withIcon onClick={openDownloadTemplateModal}>
-              <i className="material-icons-round">face</i>
-              Descargar plantilla de notas
-            </Button>
-            <Button withIcon>
-              <i className="material-icons-round">face</i>
-              Ver notas
-            </Button>
-            <Button withIcon solid>
-              <i className="material-icons-round">update</i>
-              Actualizar notas
-            </Button>
-          </div>
-      </TeacherCourseGrades>
+                  <i className="material-icons-round">face</i>
+                  Descargar plantilla de notas
+                </Button>
+                <Button withIcon>
+                  <i className="material-icons-round">face</i>
+                  Ver notas
+                </Button>
+                <Button withIcon solid>
+                  <i className="material-icons-round">update</i>
+                  Actualizar notas
+                </Button>
+              </div>
+          </TeacherCourseGrades>
           <Grid columns={2}>
             <div>
               <b className='subtitle'>Código:</b>
@@ -232,14 +294,71 @@ const TeacherCourseDetail = (props) => {
                 </tr>
                 <tr>
                   <td>Estudiantes:</td>
-                  <td>Aún no hay estudiantes en este grupo</td>
+                  <td>{
+                    course.students.length <= 0
+                      ? "Aún no hay estudiantes en este grupo"
+                      : (
+                        students
+                        ? students.map(
+                          (student) => (
+                            <div>
+                              <span>{student.username}</span>
+                            </div>
+                          )
+                        )
+                        : "Cargando..."
+                      )
+                  }</td>
                 </tr>
               </table>
             </div>
           </Grid>
-    </TeacherCourseDetailBody>
+        </TeacherCourseDetailBody>
       </div>
     }
+    <Modal
+      isOpen={downloadTemplateModalIsOpen}
+      onRequestClose={closeDownloadTemplateModal}
+      style={ModalStyles}
+      contentLabel="Example Modal"
+    >
+      <h2>Descargar plantilla de notas</h2>
+      <h3>Items de evaluación</h3>
+      {gradeItems.map((row, idx) => (
+        <div class="form-group">
+          <Input
+            type="text"
+            smallBorder
+            placeholder="Nombre"
+            name={"item-name-" + idx}
+            onChange={onItemChange}
+          />
+          <Input
+            type="number"
+            smallBorder
+            withIcon
+            placeholder="Porcentaje"
+            name={"item-percentage-" + idx}
+            onChange={onItemChange}
+          />
+        </div>
+      ))}
+      <hr />
+      <div className="modal-actions">
+        <Button
+          alt
+          onClick={() => setGradeItems([...gradeItems, { name: "", percentage: 0 }])}
+        >
+          Añadir item
+        </Button>
+        <Button
+          solid
+          onClick={() => setGradeItems([...gradeItems, { name: "", percentage: 0 }])}
+        >
+          Descargar plantilla
+        </Button>
+      </div>
+    </Modal>
   </TeacherCourseDetailContainer>
 }
 

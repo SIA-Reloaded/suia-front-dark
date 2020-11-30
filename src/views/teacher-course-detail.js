@@ -6,6 +6,7 @@ import Input from "../components/input";
 import * as awsHelper from "../utilities/aws-helper";
 import { parseDate, parseShedule } from "../utilities/date-helper";
 import Modal from 'react-modal';
+import Excel from "exceljs/dist/es5/exceljs.browser";
 
 const ModalStyles = {
   content : {
@@ -141,6 +142,9 @@ const TeacherCourseDetail = (props) => {
   const [students, setStudents] = React.useState(undefined);
 
   function openDownloadTemplateModal() {
+    setGradeItems([
+      { name: "", percentage: 0 },
+    ]);
     setDownloadTemplateIsOpen(true);
   }
 
@@ -194,6 +198,56 @@ const TeacherCourseDetail = (props) => {
       return newItes;
     });
   };
+
+  const getColumnLetter = (idx) => String.fromCharCode(65 + idx);
+
+  const downloadTemplate = () => {
+    const workbook = new Excel.Workbook();
+    const sheet = workbook.addWorksheet('Grades');
+    const padding = 5;
+    sheet.columns = [
+      {header: 'ID', key: 'id'},
+      {header: 'Nombre', key: 'name'},
+      ...gradeItems.map(
+        (gradeItem) => ({
+          header: `${gradeItem.name} - ${gradeItem.percentage}%`,
+          key: gradeItem.name.replace(/\s/g, '').toLowerCase(),
+          width: `${gradeItem.name} - ${gradeItem.percentage}%`.length + padding
+        })
+      ),
+      {header: 'Total', key: 'total'},
+    ];
+    let maxIDWidth=0, maxNameWidth=0;
+    students.forEach((student, idx) => {
+      const currentRow = idx+2;
+      const gradeFormulas = gradeItems.map((item, idx2) => `(${getColumnLetter(idx2+2)}${currentRow}*${parseFloat(item.percentage)/100})`);
+      const name = student.basicData.firstName + ' ' + student.basicData.lastName;
+      maxIDWidth = student.id.length > maxIDWidth ? student.id.length : maxIDWidth;
+      maxNameWidth = name.length > maxNameWidth ? name.length : maxNameWidth;
+      
+      sheet.addRow({
+        id: student.id,
+        name,
+        total: {
+          formula: `=${ gradeFormulas.join('+') }`
+        }
+      })
+    });
+    sheet.getColumn('id').width = maxIDWidth + padding;
+    sheet.getColumn('name').width = maxNameWidth + padding;
+    workbook.xlsx.writeBuffer().then(function (data) {
+      const a = document.createElement("a");
+      document.body.appendChild(a);
+      a.style = "display: none";
+      const blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+      const url = window.URL.createObjectURL(blob);
+      a.href = url;
+      a.download = "grades.xslx";
+      a.click();
+      window.URL.revokeObjectURL(url);
+      closeDownloadTemplateModal();
+    });
+  }
 
   return <TeacherCourseDetailContainer>
     { !course &&
@@ -353,7 +407,7 @@ const TeacherCourseDetail = (props) => {
         </Button>
         <Button
           solid
-          onClick={() => setGradeItems([...gradeItems, { name: "", percentage: 0 }])}
+          onClick={downloadTemplate}
         >
           Descargar plantilla
         </Button>

@@ -15,7 +15,6 @@ import { CenteredLoader } from './components/loader';
 
 function App(props) {
   const user = useContext(UserContext)
-  console.log(user)
 
 // User hasn't been retrieved from Firebase auth
 if (user === undefined && props.location.pathname !== '/login') {
@@ -24,6 +23,9 @@ if (user === undefined && props.location.pathname !== '/login') {
 
 // No user logged
 if (user === null && props.location.pathname !== '/login') return <Redirect to='/login' />
+
+// User logged, redirecting from login to dashboard
+if (user && props.location.pathname === '/login') return <Redirect to='/dashboard' />
 
 // User logged
 return (

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Input from '../components/input';
 import Button from '../components/button';
@@ -6,7 +6,7 @@ import Button from '../components/button';
 import IMAGES from '../assets/images/images';
 
 import { Redirect } from 'react-router';
-import { CenteredLoader } from '../components/loader';
+import Loader from '../components/loader';
 
 import { auth } from '../utilities/firebase-helper';
 
@@ -31,13 +31,19 @@ const LoginContainer = styled.div`
     button {
       width: 300px;
     }
+
+    span {
+      color: ${(props) => props.theme.colors.error};
+      margin-bottom: 15px;
+    }
   }
 `
 
 const Login = () => {
-  const [credentials, setCredentials] = React.useState({})
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [mustNavigate, setMustNavigate] = React.useState(false)
+  const [credentials, setCredentials] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
+  const [mustNavigate, setMustNavigate] = useState(false)
+  const [loginError, setLoginError] = useState(null)
 
   const handleInputChange = (event) => {
     let newCredentials = { ...credentials }
@@ -45,24 +51,25 @@ const Login = () => {
     setCredentials(newCredentials)
   }
 
+  useEffect(() => {
+    if (loginError) {
+      setIsLoading(false)
+    }
+
+  }, [loginError])
+
   const handleSubmit = async (event) => {
     event.preventDefault()
+    setLoginError(false)
     setIsLoading(true)
 
-    const result = await auth.signInWithEmailAndPassword(credentials.email, credentials.password).catch(function (error) {
-      console.log(error)
-      alert("user not found")
+    const result = await auth.signInWithEmailAndPassword(credentials.email, credentials.password).catch((error) => {
+      setLoginError(error)
       return
-    });
-
-    if (result) { // User logged in succesfuly
-      setMustNavigate(true)
-    }
+    })
   }
 
   if (mustNavigate) return <Redirect to='/dashboard' />
-
-  if (isLoading) return CenteredLoader({ height: '100%' })
 
   return <LoginContainer>
     <img src={IMAGES.UNAL_LOGO} alt='Universidad Nacional de Colombia' />
@@ -79,10 +86,12 @@ const Login = () => {
         Password:
           <Input className='margin-bottom' type='password' name='password' onChange={handleInputChange} placeholder='Password' required />
       </label>
+      {loginError && <span>Usuario o constraseña incorrectos</span>}
       <Button type="submit" solid>
         Iniciar Sesión
         </Button>
     </form>
+    {isLoading && <Loader />}
   </LoginContainer>
 }
 

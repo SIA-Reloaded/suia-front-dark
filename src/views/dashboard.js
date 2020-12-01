@@ -18,7 +18,6 @@ const DashboardContainer = styled.div`
 `
 
 const Dashboard = (props) => {
-  console.log(props)
   return <DashboardContainer>
     <SideBar {...props} />
     <Route exact path={props.match.url + "solicitudes"} component={Request} />

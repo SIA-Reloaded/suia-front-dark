@@ -8,6 +8,8 @@ import IMAGES from '../assets/images/images';
 import { Redirect } from 'react-router';
 import { CenteredLoader } from '../components/loader';
 
+import { auth } from '../utilities/firebase-helper';
+
 const LoginContainer = styled.div`
   align-items: center;
   display: flex;
@@ -47,7 +49,7 @@ const Login = () => {
     event.preventDefault()
     setIsLoading(true)
 
-    const result = await window.firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password).catch(function (error) {
+    const result = await auth.signInWithEmailAndPassword(credentials.email, credentials.password).catch(function (error) {
       console.log(error)
       alert("user not found")
       return

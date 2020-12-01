@@ -143,7 +143,9 @@ export const getGroups = async (courseName, courseCode) => {
     group.teacher
   ))
 
-  return await response.json();
+  return test;
+
+  //return await response.json();
 
 
 };

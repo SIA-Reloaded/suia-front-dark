@@ -11,8 +11,8 @@ const UserProvider = (props) => {
   useEffect(() => {
     auth.onAuthStateChanged(async userAuth => {
       if (userAuth) {
-        const usrData = await getUserData(userAuth.uid)
-        userAuth.userToken = userAuth.getIdToken()
+        const username = userAuth.email.split('@')[0];
+        const usrData = await getUserData(username)
         userAuth.userData = usrData
       }
       setUser(userAuth);

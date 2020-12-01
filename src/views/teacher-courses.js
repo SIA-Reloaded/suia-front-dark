@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import Dropdown from '../components/drop-down';
-import * as awsHelper from "../utilities/aws-helper"
+import { Link } from 'react-router-dom';
+import * as awsHelper from "../utilities/aws-helper";
 
 const TeacherCoursesContainer = styled.div`
   width: 100%;
@@ -19,24 +20,27 @@ const TeacherCoursesHeader = styled.div`
 
 const TeacherCoursesBody = styled.div`
   width: 100%;
-  height: 100%;
   margin: 0;
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
+  justify-content: flex-start;
   padding-left: 0;
 `
 
 const CourseCard = styled.div`
-  flex: 0 0 30%;
   display: flex;
   flex-direction: column;
+  flex:1 1 auto;
   justify-content: space-between;
-  margin-right: 10px;
-  margin-bottom: 10px;
+  margin-left:5px;
+  margin-bottom:5px;
+  margin-top:0;
   background-color: ${(props) => props.theme.colors.gray[4]};
   padding: 20px;
   height: 150px;
   border-radius: 20px;
+  line-height: auto;
   h3 {
     margin: 0;
     color: ${(props) => props.theme.colors.secondary};
@@ -128,7 +132,7 @@ const TeacherCourses = (props) => {
         semesterCourses.map(
           (course) => (
             <CourseCard>
-              <h3>{course.name}</h3>
+              <Link to={`/dashboard/profesor/curso/${course.id}`}><h3>{course.name}</h3></Link>
               <CourseCardFooter>
                 <p className="groups">2 grupos</p>
                 <p className="students">{course.students.length} estudiantes</p>

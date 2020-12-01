@@ -2,6 +2,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import styled from 'styled-components';
 import SideBar from '../components/sidebar'
+import ManageRequests from './manage-requests';
 import Overbook from './overbook';
 const DashboardContainer = styled.div`
   display: flex;
@@ -12,7 +13,7 @@ const DashboardContainer = styled.div`
 
 const Requests = (props) => {
   return (
-    <Overbook></Overbook>
+    <ManageRequests></ManageRequests>
   )
 }
 

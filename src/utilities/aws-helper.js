@@ -82,3 +82,35 @@ export const putRequest = async (body) => {
   )
   return await response.json()
 }
+
+export const getAllRequests = async () => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/admin/getAllRequests`
+  );
+  return await response.json();
+}
+
+export const updateRequest = async (body) => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/admin/updateRequest`,
+    {
+      method: "PUT",
+      mode: 'cors',
+      body: JSON.stringify(body),
+    }
+  )
+  return await response.json()
+}
+
+export const putStudentInCourseGroup = async (body) => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/admin/putStudentInCourseGroup`,
+    {
+      method: "PUT",
+      mode: 'cors',
+      body: JSON.stringify(body),
+    }
+  )
+  return await response.json()
+}
+

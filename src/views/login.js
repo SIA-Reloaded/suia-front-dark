@@ -30,7 +30,6 @@ const LoginContainer = styled.div`
       width: 300px;
     }
   }
-
 `
 
 const Login = () => {
@@ -59,7 +58,7 @@ const Login = () => {
     }
   }
 
-  if (mustNavigate) return <Redirect push to='/dashboard' />
+  if (mustNavigate) return <Redirect to='/dashboard' />
 
   if (isLoading) return CenteredLoader({ height: '100%' })
 

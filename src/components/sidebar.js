@@ -38,11 +38,11 @@ const SideBar = (props) => {
   const buildAdminSideBar = () => {
     return <MainMenuContainer>
       <h3>Servicios admin</h3>
-      <StyledLink className={props.location.pathname === '/dashboard/solicitudes' ? 'active' : ''} to={props.match.url + '/solicitudes'}>
+      <StyledLink className={props.location.pathname === '/solicitudes' ? 'active' : ''} to={props.match.url + 'solicitudes'}>
         <i className="material-icons-round">question_answer</i>
         Solicitudes
       </StyledLink>
-      <StyledLink  className={props.location.pathname === '/dashboard/grupos' ? 'active' : ''} to={props.match.url + '/grupos'}>
+      <StyledLink  className={props.location.pathname === '/grupos' ? 'active' : ''} to={props.match.url + 'grupos'}>
         <i className="material-icons-round">group_work</i>
         Grupos
       </StyledLink>

@@ -20,6 +20,7 @@ const Input = styled.input`
         margin-right: 12px;
       }
     `}
+
 `;
 
 export const SearchInput = styled.input`
@@ -27,9 +28,9 @@ export const SearchInput = styled.input`
   border: none;
   border-radius: ${(props) => props.theme.universalBorderRadius};
   color: ${(props) => props.theme.colors.gray[1]};
-  height: 30px;
+  height: 40px;
   margin-right: 15px;
-  padding: 4px 12px;
+  padding: 4px 18px;
   width: ${(props) => props.width || "auto"};
 
   ${(props) =>
@@ -46,4 +47,6 @@ export const SearchInput = styled.input`
       }
     `}
 `;
+
 export default Input;
+      

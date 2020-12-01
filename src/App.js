@@ -11,7 +11,6 @@ import theme from './theme/theme';
 import Login from './views/login';
 import Dashboard from './views/dashboard';
 
-
 import * as awsHelper from './utilities/aws-helper';
 import { CenteredLoader } from './components/loader';
 
@@ -58,7 +57,7 @@ function App(props) {
       {/* Content Swich*/}
       <Switch>
         <Route exact path='/login' render={(props) => (<Login setUserData={setUserData} {...props} />)} />
-        <Route path='/dashboard' component={Dashboard}/>
+        <Route path='/' component={Dashboard}/>
       </Switch>
     </ThemeProvider>
   );

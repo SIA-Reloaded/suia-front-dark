@@ -17,10 +17,10 @@ const DashboardContainer = styled.div`
 const Dashboard = (props) => {
   return <DashboardContainer>
     <SideBar {...props}/>
-    <Route exact path={props.match.url + "/solicitudes"} component={Request} />
-    <Route exact path={props.match.url + "/grupos"} component={Groups} />
-    <Route exact path={props.match.url + "/grupos/crear-grupo"} component={CreateGroup} />
-    <Route exact path={props.match.url + "/grupos/detalle"} component={GroupDetails} />
+    <Route exact path={props.match.url + "solicitudes"} component={Request} />
+    <Route exact path={props.match.url + "grupos"} component={Groups} />
+    <Route exact path={props.match.url + "grupos/crear-grupo"} component={CreateGroup} />
+    <Route exact path={props.match.url + "grupos/detalle"} component={GroupDetails} />
   </DashboardContainer>
 }
 

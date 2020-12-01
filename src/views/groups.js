@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Redirect, Link } from 'react-router-dom';
 import SectionContainer from '../components/dashboard-section';
@@ -11,6 +11,11 @@ const GroupsLayout = styled.div`
   display: flex;
   justify-content: space-between;
   margin-bottom: 30px;
+
+  form {
+    display: flex;
+    
+  }
 `;
 
 const GroupsTable = styled.table`
@@ -28,12 +33,13 @@ const GroupsTable = styled.table`
 
 const Groups = (props) => {
   const [mustNavigate, setMustNavigate] = React.useState(false)
-  const [courseCode, setCourseCode] = React.useState(false)
+  const [courseName, setCourseName] = React.useState('')
+  const [courseCode, setCourseCode] = React.useState('')
   const [rows, setRows] = React.useState([])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const rows = awsHelper.getGroups(courseCode);
+    const rows = await awsHelper.getGroups(courseName, courseCode);
     console.log(rows);
   }
 
@@ -41,22 +47,32 @@ const Groups = (props) => {
     setMustNavigate(true)
   }
 
-  const handleCourseNameChange = (e) => {
-
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value
+    switch (e.target.name) {
+      case 'courseName':
+        setCourseName(value)
+        break;
+      case 'courseCode':
+        setCourseCode(value)
+        break;
+      default:
+        break;
+    }
   }
 
-  const handleCourseCodeChange = (e) => {
-
-  }
 
   if (mustNavigate) return <Redirect push to={props.match.url + "/crear-grupo"} />
 
   return <SectionContainer>
     <GroupsLayout>
       <form onSubmit={handleSubmit}>
-
-        <SearchInput onChange={handleCourseNameChange} width='300px' placeholder='Busca por nombre de materia' />
-        <SearchInput onChange={handleCourseCodeChange} placeholder='Busca por código' />
+        <SearchInput onChange={handleSearchInputChange} name='courseName' width='300px' placeholder='Busca por nombre de materia' />
+        <SearchInput onChange={handleSearchInputChange} name='courseCode' placeholder='Busca por código' />
+        <Button type='submit' withIcon solid onClick={handleSubmit}>
+        <i className="material-icons-round">search</i>
+        Buscar grupo
+      </Button>
       </form>
       <Button withIcon solid onClick={onCreateGroupClick}>
         <i className="material-icons-round">add</i>
@@ -92,11 +108,11 @@ const Groups = (props) => {
         </tr>
       </thead>
       <tbody>
-      {rows.map(row => {
+        {rows.map(row => {
           return <tr>
-              {row.rowRepresentation.map((data) => <td key={data} >{data}</td>)}
-              <td><Link to={props.match.url + '/detalle'}>Ver</Link></td>
-            </tr>
+            {row.rowRepresentation.map((data) => <td key={data} >{data}</td>)}
+            <td><Link to={props.match.url + '/detalle'}>Ver</Link></td>
+          </tr>
         })}
       </tbody>
     </GroupsTable>

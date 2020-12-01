@@ -294,6 +294,45 @@ const TeacherCourseDetail = (props) => {
         return newGrade;
       }
     );
+    const mappedTable = [
+      ["name", ...lastGrades.grade_items.map(
+        (item) => item.id
+      ), "total"]
+    ];
+    studentGrades.forEach(
+      (student) => {
+        const studentRow = [];
+        mappedTable[0].forEach(
+          (tableRow) => {
+            if (tableRow === "name") {
+              studentRow.push(student.student.basicData.firstName + ' ' + student.student.basicData.lastName)
+            } else if (tableRow === "total") {
+              studentRow.push(
+                lastGrades.grade_items.reduce(
+                  (acc, item) => {
+                    const rowGrade = student.grades.find(
+                      (grade) => grade.grade_id === item.id
+                    );
+                    return acc + ((item.percentage/100)*rowGrade.grade)
+                  },
+                  0
+                )
+              );
+            } else {
+              const rowGrade = student.grades.find(
+                (grade) => grade.grade_id === tableRow
+              );
+              studentRow.push(rowGrade.grade)
+            }
+          }
+        );
+        mappedTable.push(studentRow);
+      }
+    )
+
+    mappedTable.shift();
+
+
     return <GradesTable>
       <thead>
         <tr>
@@ -303,16 +342,18 @@ const TeacherCourseDetail = (props) => {
               (item) => <th>{item.label} - {item.percentage}%</th>
             )
           }
+          <th>Total</th>
         </tr>
-        { studentGrades.map(
-            (student) => <tr>
-                <td>{student.student.basicData.firstName + ' ' + student.student.basicData.lastName}</td>
-                {
-                  student.grades.map(
-                    (grade) => <td>{grade.grade}</td>
-                  )
-                }
-              </tr>
+        { mappedTable.map(
+          (row) => (
+            <tr>
+              {
+                row.map(
+                  (cell) => <td>{cell}</td>
+                )
+              }
+            </tr>
+            )
           )
         }
       </thead>

@@ -72,17 +72,12 @@ export const getCourseByCode = async (courseCode) => {
   return await response.json();
 }
 
-export const putRequest = async (requester_id, courseId, type = "sobrecupo", state = 'sin_revisar') => {
+export const putRequest = async (body) => {
   const response = await fetch(
     `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/admin/putRequest`,
     {
       method: "POST",
-      body: JSON.stringify({
-        "requester_id": requester_id,
-        "courseID": courseId,
-        "type": type,
-        "state": state
-      }),
+      body: JSON.stringify(body),
     }
   )
   return await response.json()

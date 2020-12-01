@@ -69,8 +69,13 @@ const Overbook = (props) => {
     // genera la peticion de sobrecupo
     // faltaria poner el requester id (primer parametro de la funcion)
     const onClickOverbook = async (courseId) => {
-        console.log(courseId)
-        await awsHelper.putRequest("test1", courseId)
+        const body = {
+            "requester_id": "test2",
+            "courseID": courseId,
+            "type": "sobrecupo",
+            "state": "sin_revisar"
+        }
+        await awsHelper.putRequest(body)
     }
 
     return (

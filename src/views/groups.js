@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Redirect, Link } from 'react-router-dom';
 import SectionContainer from '../components/dashboard-section';
@@ -32,10 +32,16 @@ const GroupsTable = styled.table`
 `;
 
 const Groups = (props) => {
-  const [mustNavigate, setMustNavigate] = React.useState(false)
-  const [courseName, setCourseName] = React.useState('')
-  const [courseCode, setCourseCode] = React.useState('')
-  const [rows, setRows] = React.useState([])
+  const [mustNavigate, setMustNavigate] = useState(false)
+  const [courseName, setCourseName] = useState('')
+  const [courseCode, setCourseCode] = useState('')
+  const [rows, setRows] = useState([])
+
+  useEffect(() => {
+    awsHelper.getGroups().then((rows) => 
+      console.log(rows)
+    );
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()

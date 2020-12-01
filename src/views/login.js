@@ -5,7 +5,6 @@ import Button from '../components/button';
 
 import IMAGES from '../assets/images/images';
 
-import { Redirect } from 'react-router';
 import Loader from '../components/loader';
 
 import { auth } from '../utilities/firebase-helper';
@@ -42,7 +41,6 @@ const LoginContainer = styled.div`
 const Login = () => {
   const [credentials, setCredentials] = useState({})
   const [isLoading, setIsLoading] = useState(false)
-  const [mustNavigate, setMustNavigate] = useState(false)
   const [loginError, setLoginError] = useState(null)
 
   const handleInputChange = (event) => {
@@ -55,7 +53,6 @@ const Login = () => {
     if (loginError) {
       setIsLoading(false)
     }
-
   }, [loginError])
 
   const handleSubmit = async (event) => {
@@ -63,13 +60,11 @@ const Login = () => {
     setLoginError(false)
     setIsLoading(true)
 
-    const result = await auth.signInWithEmailAndPassword(credentials.email, credentials.password).catch((error) => {
+    await auth.signInWithEmailAndPassword(credentials.email, credentials.password).catch((error) => {
       setLoginError(error)
       return
     })
   }
-
-  if (mustNavigate) return <Redirect to='/dashboard' />
 
   return <LoginContainer>
     <img src={IMAGES.UNAL_LOGO} alt='Universidad Nacional de Colombia' />

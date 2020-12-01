@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import {
   Switch,
   Route,
@@ -15,6 +15,7 @@ import { CenteredLoader } from './components/loader';
 
 function App(props) {
   const user = useContext(UserContext)
+  console.log(user)
 
 // User hasn't been retrieved from Firebase auth
 if (user === undefined && props.location.pathname !== '/login') {

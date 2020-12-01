@@ -68,6 +68,13 @@ export const getGroup = async (courseID) => {
 export const getCourseByCode = async (courseCode) => {
   const response = await fetch(
     `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/getCourseById?courseCode=${courseCode}`
+    );
+  return await response.json();
+}
+
+export const getGroupGrades = async (courseID) => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/getGrades?courseID=${courseID}`
   );
   return await response.json();
 }
@@ -114,3 +121,13 @@ export const putStudentInCourseGroup = async (body) => {
   return await response.json()
 }
 
+export const putStudentGrades = async (grades) => {
+  const response = await fetch(
+    "https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/putStudentGrades",
+    {
+      method: "POST",
+      body: JSON.stringify(grades),
+    }
+  );
+  return await response.json();
+};

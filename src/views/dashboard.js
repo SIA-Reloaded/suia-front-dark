@@ -9,6 +9,7 @@ import GroupDetails from './group-details';
 import CalificacionDocente from './calificacion-docente';
 import TeacherCourses from './teacher-courses';
 import Overbook from './overbook';
+import TeacherCourseDetail from './teacher-course-detail';
 
 
 const DashboardContainer = styled.div`
@@ -28,6 +29,7 @@ const Dashboard = (props) => {
     <Route exact path={props.match.url + "/grupos/detalle"} component={GroupDetails} />
     <Route exact path={props.match.url + "/calificacion-docente"} component={CalificacionDocente} />
     <Route exact path={props.match.url + "/profesor/mis-cursos"} component={TeacherCourses} />
+    <Route exact path={props.match.url + "/profesor/curso/:courseID"} component={TeacherCourseDetail} />
   </DashboardContainer>
 }
 

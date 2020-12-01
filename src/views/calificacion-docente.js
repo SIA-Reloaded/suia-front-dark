@@ -16,7 +16,15 @@ const CalificacionDocente = () => {
   const [cleanedSemesters, setCleanedSemesters] = React.useState([]);
   const [cleanedMaterias, setCleanedMateria] = React.useState([]);
   const [semesterState, setSemesterState] = React.useState("");
-  // rateList
+  const [nameCourses, setNameCourses] = React.useState([]);
+  const [ratesTeacher, setRatesTeacher] = React.useState([])
+  
+
+  const getRatesTeacher = async () =>{
+    const rates = await awsHelper.getRates("20");
+    setRatesTeacher(rates)
+  }
+  
 
   const getSemesters = async () => {
     const rates = await awsHelper.getRates("20");
@@ -32,37 +40,62 @@ const CalificacionDocente = () => {
         return academicCalendars.includes(semester.id)
       }
     )
-    console.log(filteredSemesters)
     setCleanedSemesters(filteredSemesters)
     setSemesterState(filteredSemesters[0])
   }
 
+  const loadCoursesId = async () => {
+    const rates = await awsHelper.getRates("20"); 
+    const semesterCourses = rates.filter(
+      (rate)=> rate.academicCalendar === semesterState.id
+    );
 
-  const changeCourses = async () => {
-    const rates = await awsHelper.getRates("20");
-    setCleanedMateria(
-      rates.map(
-        (rateCourse) => {
-          return rateCourse.courseID;
+    const courses = semesterCourses.map( 
+        (course) => {
+          return course.courseID;
         }
       )
-    )
+    setCleanedMateria(courses);
+  }
+
+  const courses = async () => {
+  const coursesPromise = cleanedMaterias.map(
+    (course) => {
+      return awsHelper.getGroup(course);
+    } 
+  ); 
+
+  const courses = await Promise.all(coursesPromise);
+    setNameCourses(courses);
   }
 
   React.useEffect(
     () => {
-      getSemesters();
-      changeCourses();
+      getSemesters();  
     }, []
+  );
+
+  React.useEffect(
+    ()=>{
+      if (semesterState){
+        loadCoursesId();
+      }
+    }, [semesterState]
+  );
+
+  React.useEffect(
+    ()=>{
+      if (nameCourses){
+        courses();
+      }
+    }, [nameCourses]
   );
 
   const semestre = (e) => {
     const selectedSemester = e.target.key;
-    console.log(e.target.key);
-    console.log(e.target.value);
     setSemesterState(selectedSemester);
   }
-  console.log(semesterState)
+
   return <div>
     <Layout >
       <Layout columns>
@@ -74,10 +107,8 @@ const CalificacionDocente = () => {
           {
             cleanedSemesters.map(
               (cleanedSemesterList) =>
-                <option key={cleanedSemesterList.id}>{`${cleanedSemesterList.year}-${cleanedSemesterList.period}`}</option>
-            
+                <option key={cleanedSemesterList.id}>{`${cleanedSemesterList.year}-${cleanedSemesterList.period}`}</option>         
                 )
-
           }
 
         </Dropdown>
@@ -85,9 +116,12 @@ const CalificacionDocente = () => {
       <Layout columns>
         <h3>Asignatura</h3>
         <Dropdown width="200px">
-          {
-
-          }
+        {
+          nameCourses.map(
+            (cleanedCoursesList) =>
+              <option key={cleanedCoursesList.id}>{`${cleanedCoursesList.name}`}</option>         
+              )
+        }
         </Dropdown>
       </Layout>
 

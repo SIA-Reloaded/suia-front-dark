@@ -57,3 +57,10 @@ export const getTeacherGroups = async (teacherID) => {
   );
   return await response.json();
 }
+
+export const getGroup = async (courseID) => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod//teachers/getCourse?course_id=${courseID}`
+  );
+  return await response.json();
+}

@@ -23,7 +23,7 @@ export const createGroup = async (group) => {
     }
   );
   return await response.json();
-};
+}; 
 
 export const getCurrentAcademicCalendar = async () => {
   const response = await fetch(

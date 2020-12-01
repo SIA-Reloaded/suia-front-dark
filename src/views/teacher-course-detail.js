@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import Button from "../components/button";
 import Input from "../components/input";
+import * as uuid from "uuid";
 import * as awsHelper from "../utilities/aws-helper";
 import { parseDate, parseShedule } from "../utilities/date-helper";
 import Modal from 'react-modal';
@@ -152,10 +153,13 @@ const TeacherCourseDetail = (props) => {
   const [lastGrades, setLastGrades] = React.useState(undefined);
   const [downloadTemplateModalIsOpen,setDownloadTemplateIsOpen] = React.useState(false);
   const [gradesModalIsOpen,setGradesIsOpen] = React.useState(false);
+  const [updateGradesModalIsOpen,setUpdateGradesIsOpen] = React.useState(false);
   const [gradeItems, setGradeItems] = React.useState([
     { name: "", percentage: 0 },
   ]);
   const [students, setStudents] = React.useState(undefined);
+
+  const gradesFile = React.useRef(null);
 
   function openDownloadTemplateModal() {
     setGradeItems([
@@ -174,6 +178,14 @@ const TeacherCourseDetail = (props) => {
 
   function closeGradesModal(){
     setGradesIsOpen(false);
+  }
+
+  function openUpdateGradesModal() {
+    setUpdateGradesIsOpen(true);
+  }
+
+  function closeUpdateGradesModal(){
+    setUpdateGradesIsOpen(false);
   }
 
   React.useEffect(
@@ -360,6 +372,62 @@ const TeacherCourseDetail = (props) => {
     </GradesTable>
   }
 
+  const uploadGrades = () => {
+    const file = gradesFile.current.files[0];
+    const wb = new Excel.Workbook();
+    const reader = new FileReader()
+
+    reader.readAsArrayBuffer(file)
+    reader.onload = () => {
+      const buffer = reader.result;
+      wb.xlsx.load(buffer).then(async workbook => {
+        let grade_items = [];
+        let grades = [];
+        let grades_mapper = [];
+        workbook.eachSheet((sheet, id) => {
+          sheet.eachRow((row, rowIndex) => {
+            console.log(rowIndex);
+            if(rowIndex === 1) {
+              const totalIndex = row.values.indexOf('Total');
+              const items_header = row.values.slice(3, totalIndex);
+              grade_items = items_header.map(
+                (item) => {
+                  console.log(item);
+                  const parts = item.split(' - ');
+                  console.log(parts);
+                  const id = uuid.v1();
+                  grades_mapper[row.values.indexOf(item)] = id;
+                  return {
+                    percentage: parseFloat((parts[1]).slice(0,-1)),
+                    label: parts[0],
+                    id
+                  }
+                }
+              )
+            } else {
+              const student_grades = row.values.slice(3, grade_items.length+3);
+              grades.push({
+                student_id: row.values[1],
+                grades: student_grades.map(
+                  (grade) => ({
+                    grade_id: grades_mapper[row.values.indexOf(grade)],
+                    grade
+                  })
+                )
+              })
+            }
+          })
+        })
+        const response = await awsHelper.putStudentGrades({
+          course_id: course.id,
+          grade_items,
+          grades
+        })
+        console.log(response);
+      })
+    }
+  }
+
   return <TeacherCourseDetailContainer>
     { !course &&
       <TeacherCourseDetailHeader>
@@ -392,7 +460,7 @@ const TeacherCourseDetail = (props) => {
                   <i className="material-icons-round">face</i>
                   Ver notas
                 </Button>
-                <Button withIcon solid>
+                <Button withIcon solid onClick={openUpdateGradesModal}>
                   <i className="material-icons-round">update</i>
                   Actualizar notas
                 </Button>
@@ -531,7 +599,22 @@ const TeacherCourseDetail = (props) => {
       contentLabel="Notas"
     >
       <h2>Notas</h2>
-      {lastGrades && renderGradesTable()}
+      {(lastGrades && students) && renderGradesTable()}
+    </Modal>
+    <Modal
+      isOpen={updateGradesModalIsOpen}
+      onRequestClose={closeUpdateGradesModal}
+      style={ModalStyles}
+      contentLabel="Actualizar notas"
+    >
+      <h2>Actualizar notas</h2>
+      <Input type="file" ref={gradesFile} />
+      <Button
+          solid
+          onClick={uploadGrades}
+      >
+        Subir notas
+      </Button>
     </Modal>
   </TeacherCourseDetailContainer>
 }

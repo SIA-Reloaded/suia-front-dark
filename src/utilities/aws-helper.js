@@ -71,3 +71,14 @@ export const getGroupGrades = async (courseID) => {
   );
   return await response.json();
 }
+
+export const putStudentGrades = async (grades) => {
+  const response = await fetch(
+    "https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/putStudentGrades",
+    {
+      method: "POST",
+      body: JSON.stringify(grades),
+    }
+  );
+  return await response.json();
+};

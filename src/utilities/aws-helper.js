@@ -23,7 +23,7 @@ export const createGroup = async (group) => {
     }
   );
   return await response.json();
-}; 
+};
 
 export const getCurrentAcademicCalendar = async () => {
   const response = await fetch(
@@ -60,7 +60,30 @@ export const getTeacherGroups = async (teacherID) => {
 
 export const getGroup = async (courseID) => {
   const response = await fetch(
-    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod//teachers/getCourse?course_id=${courseID}`
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/getCourse?course_id=${courseID}`
   );
   return await response.json();
+}
+
+export const getCourseByCode = async (courseCode) => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/getCourseById?courseCode=${courseCode}`
+  );
+  return await response.json();
+}
+
+export const putRequest = async (requester_id, courseId, type = "sobrecupo", state = 'sin_revisar') => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/admin/putRequest`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        "requester_id": requester_id,
+        "courseID": courseId,
+        "type": type,
+        "state": state
+      }),
+    }
+  )
+  return await response.json()
 }

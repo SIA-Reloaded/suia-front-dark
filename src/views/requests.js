@@ -2,6 +2,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import styled from 'styled-components';
 import SideBar from '../components/sidebar'
+import Overbook from './overbook';
 const DashboardContainer = styled.div`
   display: flex;
   height: calc(100% - 80px);
@@ -9,10 +10,12 @@ const DashboardContainer = styled.div`
 
 `
 
-const Dashboard = (props) => {
-  return <div></div>
+const Requests = (props) => {
+  return (
+    <Overbook></Overbook>
+  )
 }
 
 
 
-export default Dashboard;
+export default Requests;

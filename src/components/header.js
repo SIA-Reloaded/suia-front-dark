@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import IMAGES from '../assets/images/images';
+import { UserContext } from '../providers/user-provider'
+
+import { auth } from '../utilities/firebase-helper';
 
 const HeaderContainer = styled.div`
   align-items: center;
@@ -56,11 +59,15 @@ const HeaderContainer = styled.div`
   }
 `
 
-const Header = (props) => {
+const Header = () => {
+
+  const user = useContext(UserContext)
 
   const signOut = () => {
-    window.firebase.auth().signOut()
+    auth.signOut()
   }
+
+  console.log(user)
 
   return <HeaderContainer>
     <div className='home-button'>
@@ -72,10 +79,10 @@ const Header = (props) => {
         </p>
       </div>
     </div>
-    {props.user && 
+    {user.userData && 
     <button className='user-control' onClick={signOut}>
       <i className="material-icons-round">account_circle</i>
-      <p>{`${props.user.basicData.firstName} ${props.user.basicData.lastName}`}<br/><span>{props.user.roles[0]}</span></p>
+      <p>{`${user.userData.basicData.firstName} ${user.userData.basicData.lastName}`}<br/><span>{user.userData.roles[0]}</span></p>
       <i className="material-icons-round">arrow_drop_down</i>
     </button>
     }

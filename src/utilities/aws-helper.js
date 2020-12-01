@@ -60,7 +60,14 @@ export const getTeacherGroups = async (teacherID) => {
 
 export const getGroup = async (courseID) => {
   const response = await fetch(
-    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod//teachers/getCourse?course_id=${courseID}`
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/getCourse?course_id=${courseID}`
+  );
+  return await response.json();
+}
+
+export const getGroupGrades = async (courseID) => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/getGrades?courseID=${courseID}`
   );
   return await response.json();
 }

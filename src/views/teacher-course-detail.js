@@ -128,14 +128,30 @@ const Grid = styled.div`
     }
   `
   }}
-`
+`;
+
+const GradesTable = styled.table`
+  width: 100%;
+  text-align: center;
+
+  tr {
+    td {
+      &:not(:last-child) {
+        padding: 15px 10px 15px 0;
+      }
+    }
+  }
+`;
 
 
 const TeacherCourseDetail = (props) => {
   const [course, setCourse] = React.useState(undefined);
   const [teacher, setTeacher] = React.useState(undefined);
   const [loading, setLoading] = React.useState(false);
+  const [grades, setGrades] = React.useState(undefined);
+  const [lastGrades, setLastGrades] = React.useState(undefined);
   const [downloadTemplateModalIsOpen,setDownloadTemplateIsOpen] = React.useState(false);
+  const [gradesModalIsOpen,setGradesIsOpen] = React.useState(false);
   const [gradeItems, setGradeItems] = React.useState([
     { name: "", percentage: 0 },
   ]);
@@ -152,6 +168,14 @@ const TeacherCourseDetail = (props) => {
     setDownloadTemplateIsOpen(false);
   }
 
+  function openGradesModal() {
+    setGradesIsOpen(true);
+  }
+
+  function closeGradesModal(){
+    setGradesIsOpen(false);
+  }
+
   React.useEffect(
     () => {
       getCourse();
@@ -164,6 +188,7 @@ const TeacherCourseDetail = (props) => {
       setLoading(false);
       if (course) {
         getStudents();
+        getGrades();
       }
     },
     [course]
@@ -187,6 +212,16 @@ const TeacherCourseDetail = (props) => {
           )
         }
       )
+  }
+
+  const getGrades = async () => {
+    const responseGrades = await awsHelper.getGroupGrades(props.match.params.courseID);
+    setGrades(responseGrades);
+    setLastGrades(
+      responseGrades.reduce(
+        (x, y) => x.update_datetime > y.update_datetime ? x : y
+      )
+    );
   }
 
   const onItemChange = (e) => {
@@ -249,6 +284,41 @@ const TeacherCourseDetail = (props) => {
     });
   }
 
+  const renderGradesTable = () => {
+    const studentGrades = lastGrades.grades.map(
+      (grade) => {
+        const newGrade = {...grade};
+        newGrade.student = students.find(
+          (student) => student.id === newGrade.student_id
+        )
+        return newGrade;
+      }
+    );
+    return <GradesTable>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          {
+            lastGrades.grade_items.map(
+              (item) => <th>{item.label} - {item.percentage}%</th>
+            )
+          }
+        </tr>
+        { studentGrades.map(
+            (student) => <tr>
+                <td>{student.student.basicData.firstName + ' ' + student.student.basicData.lastName}</td>
+                {
+                  student.grades.map(
+                    (grade) => <td>{grade.grade}</td>
+                  )
+                }
+              </tr>
+          )
+        }
+      </thead>
+    </GradesTable>
+  }
+
   return <TeacherCourseDetailContainer>
     { !course &&
       <TeacherCourseDetailHeader>
@@ -270,14 +340,14 @@ const TeacherCourseDetail = (props) => {
           <TeacherCourseGrades>
               <div>
                 <h3>Notas:</h3>
-                <p>Actualizado el {parseDate(course.update_datetime)}</p>
+                <p>{lastGrades ? `Actualizado el ${parseDate(lastGrades.update_datetime)}` : "Cargando"}</p>
               </div>
               <div className="actions">
                 <Button withIcon onClick={openDownloadTemplateModal}>
                   <i className="material-icons-round">face</i>
                   Descargar plantilla de notas
                 </Button>
-                <Button withIcon>
+                <Button withIcon onClick={openGradesModal}>
                   <i className="material-icons-round">face</i>
                   Ver notas
                 </Button>
@@ -374,7 +444,7 @@ const TeacherCourseDetail = (props) => {
       isOpen={downloadTemplateModalIsOpen}
       onRequestClose={closeDownloadTemplateModal}
       style={ModalStyles}
-      contentLabel="Example Modal"
+      contentLabel="Descargar plantilla"
     >
       <h2>Descargar plantilla de notas</h2>
       <h3>Items de evaluación</h3>
@@ -412,6 +482,15 @@ const TeacherCourseDetail = (props) => {
           Descargar plantilla
         </Button>
       </div>
+    </Modal>
+    <Modal
+      isOpen={gradesModalIsOpen}
+      onRequestClose={closeGradesModal}
+      style={ModalStyles}
+      contentLabel="Notas"
+    >
+      <h2>Notas</h2>
+      {lastGrades && renderGradesTable()}
     </Modal>
   </TeacherCourseDetailContainer>
 }

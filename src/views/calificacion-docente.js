@@ -144,9 +144,21 @@ const CalificacionDocente = () => {
       (answer) => answer.questionID === question.id
     )
 
-    const dataset = {
-      label: "Respuestas",
-      data: question.options.map((option) => {
+    let dataSetArr;
+
+    if (question.questionType === 'options') {
+      dataSetArr = question.options.map(
+        (option) => {
+          let optionWeight = 0;
+          console.log("option", option)
+          allAnswers.forEach(answer => {
+            if (answer.selectedOptions && answer.selectedOptions.includes(option.label)) optionWeight+=1
+          });
+          return optionWeight;
+        }
+      );
+    } else {
+      dataSetArr = question.options.sort((a,b) => a.value-b.value).map((option) => {
           console.log("allAnswers", allAnswers);
           const answerScore = allAnswers.filter(
             (answer) => answer.score === option.value
@@ -157,8 +169,13 @@ const CalificacionDocente = () => {
       )
     }
 
+    const dataset = {
+      label: "Respuestas",
+      data: dataSetArr
+    }
+
     const data = {
-      labels: question.options.map((option) => option.label),
+      labels: question.options.sort((a,b) => a.value-b.value).map((option) => option.label),
       datasets: [dataset]
     }
 
@@ -200,7 +217,7 @@ const CalificacionDocente = () => {
     </Layout>
     <TeacherRateBody>
       <h3>{courseRates.length + (courseRates.length === 1 ? ' evaluación' : ' evaluaciones')}</h3>
-        { rates &&
+        { (rates && courseRates) &&
          rates[0].questions.filter(
             (closeQuestion) => closeQuestion.options
           ).map(

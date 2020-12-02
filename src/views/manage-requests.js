@@ -115,8 +115,6 @@ const ManageRequests = (props) => {
     onClickSearch()
   })
 
-  
-
   return (
     <SectionContainer>
       <h3>Filtrar por:</h3>

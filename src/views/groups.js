@@ -6,6 +6,7 @@ import { SearchInput } from '../components/input';
 import Button from '../components/button';
 
 import * as awsHelper from '../utilities/aws-helper';
+import Group from '../models/group';
 
 const GroupsLayout = styled.div`
   display: flex;
@@ -38,15 +39,27 @@ const Groups = (props) => {
   const [rows, setRows] = useState([])
 
   useEffect(() => {
-    awsHelper.getGroups().then((rows) => 
-      console.log(rows)
+    awsHelper.getGroups().then((response) => {
+      const rows = response.map((group) => new Group(
+        group.id,
+        group.name,
+        group.code,
+        group.capacityDistribution,
+        group.group,
+        group.schedule,
+        group.classroom,
+        group.students,
+        group.teacher
+      ))
+      setRows(rows)
+    }
     );
   }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     const rows = await awsHelper.getGroups(courseName, courseCode);
-    console.log(rows);
+    setRows(rows)
   }
 
   const onCreateGroupClick = () => {
@@ -76,7 +89,7 @@ const Groups = (props) => {
         <SearchInput onChange={handleSearchInputChange} name='courseName' width='300px' placeholder='Busca por nombre de materia' />
         <SearchInput onChange={handleSearchInputChange} name='courseCode' placeholder='Busca por código' />
         <Button type='submit' withIcon solid onClick={handleSubmit}>
-        <i className="material-icons-round">search</i>
+          <i className="material-icons-round">search</i>
         Buscar grupo
       </Button>
       </form>

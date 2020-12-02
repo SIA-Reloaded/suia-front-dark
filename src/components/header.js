@@ -67,24 +67,22 @@ const Header = () => {
     auth.signOut()
   }
 
-  console.log(user)
-
   return <HeaderContainer>
     <div className='home-button'>
-      <img src={IMAGES.UNAL_LOGO} alt='Universidad Nacional de Colombia'/>
+      <img src={IMAGES.UNAL_LOGO} alt='Universidad Nacional de Colombia' />
       <div>
         <p>
-          Sistema <b>Unificado</b> de<br/>información <b>académica</b><br/>
+          Sistema <b>Unificado</b> de<br />información <b>académica</b><br />
           <span>Universidad Nacional de Colombia</span>
         </p>
       </div>
     </div>
-    {user.userData && 
-    <button className='user-control' onClick={signOut}>
-      <i className="material-icons-round">account_circle</i>
-      <p>{`${user.userData.basicData.firstName} ${user.userData.basicData.lastName}`}<br/><span>{user.userData.roles[0]}</span></p>
-      <i className="material-icons-round">arrow_drop_down</i>
-    </button>
+    {user.userData &&
+      <button className='user-control' onClick={signOut}>
+        <i className="material-icons-round">account_circle</i>
+        <p>{`${user.userData.basicData.firstName} ${user.userData.basicData.lastName}`}<br /><span>{user.userData.roles[0]}</span></p>
+        <i className="material-icons-round">arrow_drop_down</i>
+      </button>
     }
   </HeaderContainer>
 }

@@ -68,7 +68,8 @@ const Centered = styled.div`
   align-items: center;
   display: flex;
   justify-content: center;
-  height: ${(props) => props.height || 'auto'}
+  height: ${(props) => props.height || 'auto'};
+  width: 100%;
 `
 
 const Loader = () => {

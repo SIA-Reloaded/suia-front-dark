@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Input from "../components/input";
 import Button from "../components/button.js";
 import GroupModel from "../models/group";
 import { createGroup } from "../utilities/aws-helper";
+
+import * as awsHelper from '../utilities/aws-helper';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+
+import { CenteredLoader } from '../components/loader';
+import { Redirect } from "react-router";
 
 const CreateGroupLayout = styled.div`
   display: flex;
@@ -31,47 +37,69 @@ const FormContainer = styled.div`
     justify-content: flex-start;
     flex: 1;
     padding: 20px;
+
     .form-group {
       display: flex;
-      flex-direction: row;
+      justify-content: space-between;
       align-items: center;
-      padding: 5px;
-      padding-left: 20px;
-      padding-button: 10px;
       flex-wrap: wrap;
-      * {
-        flex-basis: 80%;
-        flex: 1;
-        padding-right: 5px;
+
+      input {
+        max-width: 32%;
+        margin-bottom: 10px;
       }
+
       h4 {
         margin: 0;
       }
     }
   }
+
+  #auto-complete-input {
+    height: 30px;
+  }
 `;
 
+const AutocompleteContainer = styled.div`
+  display: flex;
+
+  div {
+    margin-right: 15px;
+  }
+`
+
 const CreateGroup = (props) => {
-  const [courseName, setCourseName] = useState("");
-  const [courseCode, setCourseCode] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedCourseCode, setselectedCourseCode] = useState("");
   const [discObli, setDiscObli] = useState(0);
   const [discOpta, setDiscOpta] = useState(0);
   const [fund, setFund] = useState(0);
   const [libre, setLibre] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [mustNavigate, setMustNavigate] = useState(false);
   const [shedule, setShedule] = useState([
     { day: "", startHours: "", endHours: "" },
   ]);
 
+
+  useEffect(() => {
+    awsHelper.getCourses().then((data) => {
+      setCourses(data)
+    });
+  }, [])
+
   const saveGroup = async () => {
+    setIsLoading(true)
     const group = new GroupModel(
       null,
-      courseName,
-      courseCode,
+      selectedCourse.name,
+      selectedCourseCode.code,
       {
-        disciplinaryObligatory: discObli,
-        disciplinaryOptional: discOpta,
-        fundamentation: fund,
-        freeElection: libre,
+        disciplinaryObligatory: parseInt(discObli),
+        disciplinaryOptional: parseInt(discOpta),
+        fundamentation: parseInt(fund),
+        freeElection: parseInt(libre),
       },
       1,
       shedule,
@@ -79,7 +107,10 @@ const CreateGroup = (props) => {
       [],
       null
     );
-    console.log(await createGroup(group));
+
+    await createGroup(group);
+    console.log("lala")
+    setMustNavigate(true)
   };
 
   const onSessionChange = (e) => {
@@ -92,24 +123,49 @@ const CreateGroup = (props) => {
     });
   };
 
+  if ( mustNavigate) return <Redirect to='/grupos'/>;
+  if ( isLoading ) return <CenteredLoader/>;
+
   return (
     <CreateGroupLayout>
       <h1>Nuevo grupo</h1>
       <FormContainer>
-        <div class="column">
+        <div className="column">
           <h3>Materia:</h3>
-          <Input
-            width="200px"
-            placeholder="Nombre"
-            onChange={(e) => setCourseName(e.target.value)}
-          />
-          <Input
-            width="200px"
-            placeholder="Código"
-            onChange={(e) => setCourseCode(e.target.value)}
-          />
+          <AutocompleteContainer>
+            <Autocomplete
+              value={selectedCourse}
+              onChange={(event, newValue) => {
+                console.log(newValue)
+                setSelectedCourse(newValue);
+                setselectedCourseCode(newValue);
+              }}
+              options={courses}
+              getOptionLabel={(option) => option.name || ''}
+              renderInput={(params) => (
+                <div ref={params.InputProps.ref}>
+                  <Input width="250px" type="text" {...params.inputProps} placeholder='Nombre' />
+                </div>
+              )}
+            />
+            <Autocomplete
+              value={selectedCourseCode}
+              onChange={(event, newValue) => {
+                console.log(newValue)
+                setSelectedCourse(newValue);
+                setselectedCourseCode(newValue);
+              }}
+              options={courses}
+              getOptionLabel={(option) => option.code || ''}
+              renderInput={(params) => (
+                <div ref={params.InputProps.ref}>
+                  <Input width="250px" type="text" {...params.inputProps} placeholder='Código' />
+                </div>
+              )}
+            />
+          </AutocompleteContainer>
           <h3>Cupos:</h3>
-          <div class="form-group">
+          <div className="form-group">
             <h4>Disc. obligatoria</h4>
             <Input
               type="number"
@@ -117,7 +173,7 @@ const CreateGroup = (props) => {
               onChange={(e) => setDiscObli(e.target.value)}
             />
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <h4>Disc. optativa</h4>
             <Input
               type="number"
@@ -125,7 +181,7 @@ const CreateGroup = (props) => {
               onChange={(e) => setDiscOpta(e.target.value)}
             />
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <h4>Fundamentación</h4>
             <Input
               type="number"
@@ -133,7 +189,7 @@ const CreateGroup = (props) => {
               onChange={(e) => setFund(e.target.value)}
             />
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <h4>Libre elección</h4>
             <Input
               type="number"
@@ -141,7 +197,7 @@ const CreateGroup = (props) => {
               onChange={(e) => setLibre(e.target.value)}
             />
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <h4>Total</h4>
             {parseInt(discObli) +
               parseInt(discOpta) +
@@ -149,27 +205,27 @@ const CreateGroup = (props) => {
               parseInt(libre)}
           </div>
           <h3>Horarios:</h3>
-          {shedule.map((row, idx) => (
-            <div class="form-group">
+          {shedule.map((row, i) => (
+            <div key={i} className="form-group">
               <Input
                 type="text"
                 smallBorder
                 placeholder="Day"
-                name={"session-day-" + idx}
+                name={"session-day-" + i}
                 onChange={onSessionChange}
               />
               <Input
                 type="text"
                 smallBorder
                 placeholder="Start hour"
-                name={"session-startHours-" + idx}
+                name={"session-startHours-" + i}
                 onChange={onSessionChange}
               />
               <Input
                 type="text"
                 smallBorder
                 placeholder="End hour"
-                name={"session-endHours-" + idx}
+                name={"session-endHours-" + i}
                 onChange={onSessionChange}
               />
             </div>
@@ -181,7 +237,7 @@ const CreateGroup = (props) => {
             Añadir horario
           </Button>
         </div>
-        <div class="column">
+        <div className="column">
           <h3>Participantes</h3>
           <div>
             <h4>Profesor:</h4>
@@ -196,7 +252,7 @@ const CreateGroup = (props) => {
           </div>
         </div>
       </FormContainer>
-      <div class="actions">
+      <div className="actions">
         <Button>Cancelar</Button>
         <Button solid onClick={saveGroup}>
           Crear grupo

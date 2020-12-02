@@ -49,4 +49,3 @@ export const SearchInput = styled.input`
 `;
 
 export default Input;
-      

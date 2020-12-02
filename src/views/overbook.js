@@ -20,7 +20,7 @@ const CourseCard = styled.div`
   flex: 0 0 30%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   margin-right: 10px;
   margin-bottom: 10px;
   background-color: ${(props) => props.theme.colors.gray[4]};
@@ -54,81 +54,105 @@ const CoursesContainer = styled.div`
   width: 100%;
   padding-top: 10px;
 `
+const Div = styled.div`
+  display: flex;
+  flex-direction: column;
+  width:50%;
+`
+
+const DivSchedule = styled.div`
+  display: flex;
+  flex-direction: column;
+  width:100%;
+  font-size: 80%;
+  color: grey;
+`
 
 const Overbook = (props) => {
 
-    const [courses, setCourses] = React.useState([])
-    const [courseCode, setCourseCode] = React.useState(null)
-    const user = useContext(UserContext)
+  const [courses, setCourses] = React.useState([])
+  const [courseCode, setCourseCode] = React.useState(null)
+  const user = useContext(UserContext)
 
-    const getCoursesByCode = async () => {
+  const getCoursesByCode = async () => {
 
-        setCourses(await awsHelper.getCourseByCode(courseCode))
+    setCourses(await awsHelper.getCourseByCode(courseCode))
+  }
+
+
+  // genera la peticion de sobrecupo
+  // faltaria poner el requester id (primer parametro de la funcion)
+  const onClickOverbook = async (courseId, courseName) => {
+    const body = {
+      "requester_id": user.userData.id,
+      "courseID": courseId,
+      "courseName": courseName,
+      "type": "sobrecupo",
+      "state": "sin_revisar"
     }
+    await awsHelper.putRequest(body)
+  }
+
+  const onClickSearch = async () => {
+    getCoursesByCode()
+  }
+
+  return (
+    <SectionContainer>
+      <h1>SobreCupo</h1>
+
+      <h2>Materia</h2>
+
+      <div>Cód. Materia</div>
 
 
-    // genera la peticion de sobrecupo
-    // faltaria poner el requester id (primer parametro de la funcion)
-    const onClickOverbook = async (courseId) => {
-        const body = {
-            "requester_id": user.userData.id,
-            "courseID": courseId,
-            "type": "sobrecupo",
-            "state": "sin_revisar"
-        }
-        await awsHelper.putRequest(body)
-    }
-
-    const onClickSearch = async () => {
-        getCoursesByCode()
-    }
-
-    return (
-        <SectionContainer>
-            <h1>SobreCupo</h1>
-            <h2>Materia</h2>
-
-            <div>Cód. Materia</div>
-            <div>
-                <Input value={courseCode} onChange={e => setCourseCode(e.target.value)}></Input>
-                <Button type='submit' withIcon solid onClick={onClickSearch}>
-                    <i className="material-icons-round">search</i>
+      <div>
+        <Input
+          marginTop="40px"
+          value={courseCode} onChange={e => setCourseCode(e.target.value)}></Input>
+        <Button
+          marginTop="20px"
+          type='submit' withIcon solid onClick={onClickSearch}>
+          <i className="material-icons-round">search</i>
                     Buscar grupo
                 </Button>
-            </div>
-            <CoursesContainer>
-                <CourseInfo>
-                    {
-                        courses.map(
-                            (course) => (
-                                <CourseCard>
-                                    <h3>{course["name"]}</h3>
-                                    <CourseCardFooter>
-                                        <p className="classroom">{course["classroom"]}</p>
-                                        <div className="schedule">
-                                            {course.schedule.map((schedule) => (
-                                                <>
-                                                    <li className={schedule.day}>{schedule.day} {schedule.startHours} {schedule.endHours}</li>
-                                                </>
-                                            )
-                                            )
-                                            }
 
-                                        </div>
+      </div>
+      <CoursesContainer>
+        <CourseInfo>
+          {
+            courses.map(
+              (course) => (
+                <CourseCard>
+                  <h3>{course["name"]}</h3>
+                  <CourseCardFooter>
+                    <Div>
+                      <p className="classroom">{course["classroom"]}</p>
+                      {course.schedule.map((schedule) => (
+                        <li className={schedule.day}>{schedule.day} {schedule.startHours} {schedule.endHours}</li>
+                      )
+                      )
+                      }
+                    </Div>
+                    <DivSchedule>
+                      <li type="square">Elección Libre - {course.capacityDistribution.freeElection}</li>
+                      <li type="square">Fundamentación - {course.capacityDistribution.fundamentation}</li>
+                      <li type="square"> Obligatoria Opcional - {course.capacityDistribution.disciplinaryOptional}</li>
+                      <li type="square"> Obligatoria Obligatoria - {course.capacityDistribution.disciplinaryObligatory}</li>
+                    </DivSchedule>
+                  </CourseCardFooter>
+                  <Button solid onClick={e => onClickOverbook(course.id, course.name)}>Pedir Sobrecupo</Button>
+                </CourseCard>
+              )
 
-                                    </CourseCardFooter>
-                                    <Button solid onClick={e => onClickOverbook(course.id)}>Pedir Sobrecupo</Button>
-                                </CourseCard>
-                            )
+            )
 
-                        )
+          }
+        </CourseInfo>
+      </CoursesContainer>
 
-                    }
-                </CourseInfo>
-            </CoursesContainer>
-
-        </SectionContainer >
-    )
+    </SectionContainer >
+  )
 }
 
 export default Overbook

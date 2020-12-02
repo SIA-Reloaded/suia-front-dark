@@ -59,6 +59,15 @@ const Div = styled.div`
   flex-direction: column;
   width:50%;
 `
+
+const DivSchedule = styled.div`
+  display: flex;
+  flex-direction: column;
+  width:100%;
+  font-size: 80%;
+  color: grey;
+`
+
 const Overbook = (props) => {
 
   const [courses, setCourses] = React.useState([])
@@ -98,12 +107,12 @@ const Overbook = (props) => {
 
 
       <div>
-        <Input 
-        marginTop = "40px"
-        value={courseCode} onChange={e => setCourseCode(e.target.value)}></Input>
+        <Input
+          marginTop="40px"
+          value={courseCode} onChange={e => setCourseCode(e.target.value)}></Input>
         <Button
-        marginTop ="20px"
-        type='submit' withIcon solid onClick={onClickSearch}>
+          marginTop="20px"
+          type='submit' withIcon solid onClick={onClickSearch}>
           <i className="material-icons-round">search</i>
                     Buscar grupo
                 </Button>
@@ -118,13 +127,19 @@ const Overbook = (props) => {
                   <h3>{course["name"]}</h3>
                   <CourseCardFooter>
                     <Div>
-                    <p className="classroom">{course["classroom"]}</p>
-                      {course.schedule.map((schedule) => (                       
-                        <li className={schedule.day}>{schedule.day} {schedule.startHours} {schedule.endHours}</li>                       
-                          )
-                        )
+                      <p className="classroom">{course["classroom"]}</p>
+                      {course.schedule.map((schedule) => (
+                        <li className={schedule.day}>{schedule.day} {schedule.startHours} {schedule.endHours}</li>
+                      )
+                      )
                       }
                     </Div>
+                    <DivSchedule>
+                      <li type="square">Elección Libre - {course.capacityDistribution.freeElection}</li>
+                      <li type="square">Fundamentación - {course.capacityDistribution.fundamentation}</li>
+                      <li type="square"> Obligatoria Opcional - {course.capacityDistribution.disciplinaryOptional}</li>
+                      <li type="square"> Obligatoria Obligatoria - {course.capacityDistribution.disciplinaryObligatory}</li>
+                    </DivSchedule>
                   </CourseCardFooter>
                   <Button solid onClick={e => onClickOverbook(course.id, course.name)}>Pedir Sobrecupo</Button>
                 </CourseCard>

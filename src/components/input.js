@@ -6,7 +6,7 @@ const Input = styled.input`
   height: ${(props) => props.height || "30px"};
   padding: 4px 12px;
   width: ${(props) => props.width || "auto"};
-
+  margin-top: ${(props) => props.marginTop};
   ${(props) =>
     props.smallBorder &&
     css`

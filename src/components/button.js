@@ -10,6 +10,7 @@ const StyledButton = styled.button`
   font-family: "Ancizar";
   font-size: ${(props) => props.theme.textTheme.fontSize.normal};
   padding: 8px 20px;
+  margin-top: ${(props) => props.marginTop};
 
   &:hover {
     background-color: ${(props) => props.theme.colors.primaryDarks};

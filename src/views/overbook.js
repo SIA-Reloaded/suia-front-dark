@@ -20,7 +20,7 @@ const CourseCard = styled.div`
   flex: 0 0 30%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   margin-right: 10px;
   margin-bottom: 10px;
   background-color: ${(props) => props.theme.colors.gray[4]};
@@ -54,7 +54,11 @@ const CoursesContainer = styled.div`
   width: 100%;
   padding-top: 10px;
 `
-
+const Div = styled.div`
+  display: flex;
+  flex-direction: column;
+  width:50%;
+`
 const Overbook = (props) => {
 
   const [courses, setCourses] = React.useState([])
@@ -87,15 +91,23 @@ const Overbook = (props) => {
   return (
     <SectionContainer>
       <h1>SobreCupo</h1>
+
       <h2>Materia</h2>
 
       <div>Cód. Materia</div>
+
+
       <div>
-        <Input value={courseCode} onChange={e => setCourseCode(e.target.value)}></Input>
-        <Button type='submit' withIcon solid onClick={onClickSearch}>
+        <Input 
+        marginTop = "40px"
+        value={courseCode} onChange={e => setCourseCode(e.target.value)}></Input>
+        <Button
+        marginTop ="20px"
+        type='submit' withIcon solid onClick={onClickSearch}>
           <i className="material-icons-round">search</i>
                     Buscar grupo
                 </Button>
+
       </div>
       <CoursesContainer>
         <CourseInfo>
@@ -105,18 +117,14 @@ const Overbook = (props) => {
                 <CourseCard>
                   <h3>{course["name"]}</h3>
                   <CourseCardFooter>
+                    <Div>
                     <p className="classroom">{course["classroom"]}</p>
-                    <div className="schedule">
-                      {course.schedule.map((schedule) => (
-                        <>
-                          <li className={schedule.day}>{schedule.day} {schedule.startHours} {schedule.endHours}</li>
-                        </>
-                      )
-                      )
+                      {course.schedule.map((schedule) => (                       
+                        <li className={schedule.day}>{schedule.day} {schedule.startHours} {schedule.endHours}</li>                       
+                          )
+                        )
                       }
-
-                    </div>
-
+                    </Div>
                   </CourseCardFooter>
                   <Button solid onClick={e => onClickOverbook(course.id, course.name)}>Pedir Sobrecupo</Button>
                 </CourseCard>

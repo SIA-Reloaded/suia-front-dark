@@ -47,12 +47,11 @@ const TeacherRateBody = styled.div`
 const CalificacionDocente = () => {
 
   const [cleanedSemesters, setCleanedSemesters] = React.useState([]);
-  const [cleanedMaterias, setCleanedMateria] = React.useState([]);
-  const [semesterState, setSemesterState] = React.useState("");
-  const [nameCourses, setNameCourses] = React.useState([]);
+  const [semesterCourses, setSemesterCourses] = React.useState([]);
+  const [semesterSelected, setSemesterSelected] = React.useState("");
   const [courseSelected, setCourseSelected] = React.useState("");
-  const [cleanedRates, setCleanedRates] = React.useState([]);
-  const [rates, setRates] = React.useState([]);
+  const [courseRates, setCourseRates] = React.useState([]);
+  const [rates, setRates] = React.useState(null);
 
   const getSemesters = async () => {
     const responseRates = await awsHelper.getRates("20");
@@ -69,89 +68,91 @@ const CalificacionDocente = () => {
       }
     )
     setCleanedSemesters(filteredSemesters)
-    setSemesterState(filteredSemesters[0])
+    setSemesterSelected(filteredSemesters[0].id)
     setRates(responseRates);
   }
 
-  const loadCoursesId = async () => {
-    const rates = await awsHelper.getRates("20"); 
-    const semesterCourses = rates.filter(
-      (rate)=> rate.academicCalendar === semesterState.id
+  const loadCourses = async () => {
+    const coursesSemester = rates.filter(
+      (rate)=> rate.academicCalendar === semesterSelected
+    )
+
+
+    const coursesPromises = coursesSemester.map( 
+      (rateSemester) => {
+        return awsHelper.getGroup(rateSemester.courseID);
+      }
+    )
+
+    const responseCourses = await Promise.all(coursesPromises);
+    setSemesterCourses(
+      responseCourses
     );
-
-    const courses = semesterCourses.map( 
-        (course) => {
-          return course.courseID;
-        }
-      )
-    setCleanedMateria(courses);
+    setCourseSelected(responseCourses.length > 0 ? responseCourses[0] : '')
   }
 
-  const courses = async () => {
-    const coursesPromise = cleanedMaterias.map(
-      (course) => {
-        return awsHelper.getGroup(course);
-      } 
-    ); 
-
-    const courses = await Promise.all(coursesPromise);
-    setNameCourses(courses);
-  }
- 
   //Contexto
-  const getCleanedRates = () =>{ 
-    console.log("semesterState.id", semesterState.id)
-    const responseCleanedRates = rates.filter(
-      (rate)=> rate.academicCalendar === semesterState.id && rate.courseID === courseSelected
+  const getCourseRates = () =>{
+    setCourseRates(
+      rates.filter(
+        (rate)=> rate.academicCalendar === semesterSelected && rate.courseID === courseSelected
+      )
     );
-    console.log("cleanedRates", responseCleanedRates)
-    setCleanedRates(responseCleanedRates);
   }
 
   React.useEffect(
     () => {
+      console.log('Getting semesters');
       getSemesters();
-      //console.log(rates[0].questions)  
     }, []
   );
 
   React.useEffect(
     ()=>{
-      if (semesterState){
-        loadCoursesId();
+      if (semesterSelected && rates){
+        loadCourses();
       }
-    }, [semesterState]
-  );
-
-  React.useEffect(
-    ()=>{
-      if (nameCourses){
-        courses();
-      }
-    }, [nameCourses]
+    }, [semesterSelected, rates]
   );
 
   React.useEffect(
     ()=>{
       if (courseSelected){
         console.log('courseSelected')
-        getCleanedRates();
+        getCourseRates();
       }
     }, [courseSelected]
   );
 
+  React.useEffect(
+    ()=>{
+      if (courseRates){
+        console.log('courseRates', courseRates.length)
+      }
+    }, [courseRates]
+  );
 
+  const getQuestionResults = (question) => {
+    const allAnswers = [].concat.apply([] ,(
+        courseRates
+          .map(
+            (rate) => rate.answers
+          )
+      )
+    ).filter(
+      (answer) => answer.questionID === question.id
+    )
+    console.log("asd", allAnswers);
 
-  const semestre = (e) => {
-    const selectedSemester = e.target.key;
-    setSemesterState(selectedSemester);
+    console.log("courseRates", courseRates);
+    console.log("question", question.id);
+
+    return <p>{
+      JSON.stringify(allAnswers, undefined, 2)  
+    }</p>
+
   }
 
-  const course = (e) => {
-    const selectedCourse = e.target.value;
-    console.log("selectedCourse", selectedCourse);
-    setCourseSelected(selectedCourse);
-  }
 
   return <div>
     <Layout >
@@ -159,12 +160,12 @@ const CalificacionDocente = () => {
         <h3>Semestre</h3>
         <Dropdown
           width="150px"
-          onChange={semestre}
+          onChange={(e) => setSemesterSelected(e.target.value)}
         >
           {
             cleanedSemesters.map(
               (cleanedSemesterList) =>
-                <option key={cleanedSemesterList.id}>{`${cleanedSemesterList.year}-${cleanedSemesterList.period}`}</option>         
+                <option key={cleanedSemesterList.id} value={cleanedSemesterList.id}>{`${cleanedSemesterList.year}-${cleanedSemesterList.period}`}</option>         
                 )
           }
 
@@ -174,28 +175,29 @@ const CalificacionDocente = () => {
         <h3>Asignatura</h3>
         <Dropdown 
         width="200px"
-        onChange={course}>
+        onChange={(e) => setCourseSelected(e.target.value)}>
         {
-          nameCourses.map(
+          semesterCourses.map(
             (cleanedCoursesList) =>
               <option key={cleanedCoursesList.id} value={cleanedCoursesList.id}>{`${cleanedCoursesList.name}`}</option>        
               )
         }
         </Dropdown>
       </Layout>
-      <h3
-      >{cleanedRates} evaluaciones</h3>
     </Layout>
     <TeacherRateBody>
-        {
-         /*rates[0].questions.filter(
+      <h3>{courseRates.length + (courseRates.length === 1 ? ' evaluación' : ' evaluaciones')}</h3>
+        { rates &&
+         rates[0].questions.filter(
             (closeQuestion) => closeQuestion.options
           ).map(
-            (question) =>
-          <Card key={question.id}>
-            <h3 >Pregunta # ?</h3>
-            {`${question.label}`}</Card>
-          )*/
+            (question, questionIdx) =>
+              <Card key={question.id}>
+                <h3 >Pregunta # {questionIdx + 1}</h3>
+                {`${question.label}`}
+                { getQuestionResults(question) }
+              </Card>
+          )
         }
       
     </TeacherRateBody>

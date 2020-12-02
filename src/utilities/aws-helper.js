@@ -237,8 +237,7 @@ export const updateRequest = async (body) => {
   const response = await fetch(
     `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/admin/updateRequest`,
     {
-      method: "PUT",
-      mode: 'cors',
+      method: "POST",
       body: JSON.stringify(body),
     }
   )

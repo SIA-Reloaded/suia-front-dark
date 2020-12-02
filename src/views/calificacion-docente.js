@@ -2,6 +2,7 @@ import React from 'react'
 import Dropdown from '../components/drop-down';
 import styled from 'styled-components';
 import * as awsHelper from '../utilities/aws-helper';
+import { Bar } from 'react-chartjs-2';
 
 const Layout = styled.div`
     width:600px;
@@ -24,7 +25,7 @@ const Card = styled.div`
   border-style: solid;
   border-color: ${(props) => props.theme.colors.gray[4]};
   padding: 20px;
-  height: 150px;
+  height: 500px;
   border-radius: 20px;
 
   line-height: auto;
@@ -142,14 +143,26 @@ const CalificacionDocente = () => {
     ).filter(
       (answer) => answer.questionID === question.id
     )
-    console.log("asd", allAnswers);
 
-    console.log("courseRates", courseRates);
-    console.log("question", question.id);
+    const dataset = {
+      label: "Respuestas",
+      data: question.options.map((option) => {
+          console.log("allAnswers", allAnswers);
+          const answerScore = allAnswers.filter(
+            (answer) => answer.score === option.value
+          ).length
+          console.log("answerScore", answerScore);
+          return answerScore
+        }
+      )
+    }
 
-    return <p>{
-      JSON.stringify(allAnswers, undefined, 2)  
-    }</p>
+    const data = {
+      labels: question.options.map((option) => option.label),
+      datasets: [dataset]
+    }
+
+    return <Bar data={data} />
 
   }
 

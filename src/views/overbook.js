@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import SectionContainer from '../components/section-container'
 import Dropdown from './../components/drop-down'
 import Button from './../components/button'
 import Input from './../components/input'
 import * as awsHelper from './../utilities/aws-helper'
 import styled from 'styled-components'
+import { UserContext } from '../providers/user-provider'
 
 
 const CourseInfo = styled.div`
@@ -48,34 +49,38 @@ const CourseCardFooter = styled.div`
   }
 `
 
+const CoursesContainer = styled.div`
+  height: calc(100% - 80px);
+  width: 100%;
+  padding-top: 10px;
+`
+
 const Overbook = (props) => {
 
     const [courses, setCourses] = React.useState([])
-    const [courseCode, setCourseCode] = React.useState(0)
+    const [courseCode, setCourseCode] = React.useState(null)
+    const user = useContext(UserContext)
 
     const getCoursesByCode = async () => {
 
         setCourses(await awsHelper.getCourseByCode(courseCode))
-        console.log(courses)
     }
 
-    React.useEffect(
-        () => {
-            getCoursesByCode()
-        },
-        [courseCode]
-    )
 
     // genera la peticion de sobrecupo
     // faltaria poner el requester id (primer parametro de la funcion)
     const onClickOverbook = async (courseId) => {
         const body = {
-            "requester_id": "test2",
+            "requester_id": user.userData.id,
             "courseID": courseId,
             "type": "sobrecupo",
             "state": "sin_revisar"
         }
         await awsHelper.putRequest(body)
+    }
+
+    const onClickSearch = async () => {
+        getCoursesByCode()
     }
 
     return (
@@ -84,37 +89,43 @@ const Overbook = (props) => {
             <h2>Materia</h2>
 
             <div>Cód. Materia</div>
-            <Input value={courseCode} onChange={e => setCourseCode(e.target.value)}></Input>
+            <div>
+                <Input value={courseCode} onChange={e => setCourseCode(e.target.value)}></Input>
+                <Button type='submit' withIcon solid onClick={onClickSearch}>
+                    <i className="material-icons-round">search</i>
+                    Buscar grupo
+                </Button>
+            </div>
+            <CoursesContainer>
+                <CourseInfo>
+                    {
+                        courses.map(
+                            (course) => (
+                                <CourseCard>
+                                    <h3>{course["name"]}</h3>
+                                    <CourseCardFooter>
+                                        <p className="classroom">{course["classroom"]}</p>
+                                        <div className="schedule">
+                                            {course.schedule.map((schedule) => (
+                                                <>
+                                                    <li className={schedule.day}>{schedule.day} {schedule.startHours} {schedule.endHours}</li>
+                                                </>
+                                            )
+                                            )
+                                            }
 
-            <CourseInfo>
-                {
-                    courses.map(
-                        (course) => (
+                                        </div>
 
-                            <CourseCard>
-                                <h3>{course["name"]}</h3>
-                                <CourseCardFooter>
-                                    <p className="classroom">{course["classroom"]}</p>
-                                    <p className="schedule">
-                                        {course.schedule.map((schedule) => (
-                                            <>
-                                                <li className={schedule.day}>{schedule.day} {schedule.startHours} {schedule.endHours}</li>
-                                            </>
-                                        )
-                                        )
-                                        }
+                                    </CourseCardFooter>
+                                    <Button solid onClick={e => onClickOverbook(course.id)}>Pedir Sobrecupo</Button>
+                                </CourseCard>
+                            )
 
-                                    </p>
-
-                                </CourseCardFooter>
-                                <Button onClick={e => onClickOverbook(course.id)}>Pedir Sobrecupo</Button>
-                            </CourseCard>
                         )
 
-                    )
-
-                }
-            </CourseInfo>
+                    }
+                </CourseInfo>
+            </CoursesContainer>
 
         </SectionContainer >
     )

@@ -1,53 +1,31 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import SectionContainer from '../components/section-container'
 import Dropdown from './../components/drop-down'
 import Button from './../components/button'
-import Input from './../components/input'
 import * as awsHelper from './../utilities/aws-helper'
 import styled from 'styled-components'
-import Requests from './requests'
+
+import { UserContext } from '../providers/user-provider'
 
 
-const CourseInfo = styled.div`
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  padding-left: 0;
-`
 const CourseCard = styled.div`
   flex: 0 0 30%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   margin-right: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
   background-color: ${(props) => props.theme.colors.gray[4]};
-  padding: 20px;
-  height: 150px;
-  border-radius: 20px;
-  h3 {
+  padding: 5px;
+  height: 250px;
+  border-radius: 15px;
+  h4 {
     margin: 0;
     color: ${(props) => props.theme.colors.secondary};
     font-weight: 600;
   }
 `
 
-const CourseCardFooter = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  .groups {
-    flex: 0 0 100%;
-  }
-  .students, .code {
-    flex: 0 0 50%;
-  }
-  p {
-    margin-top: 5px;
-    margin-bottom: 0;
-  }
-`
 const RequestsSearchTable = styled.table`
     width: 40%;
     text-align: center;
@@ -83,19 +61,28 @@ const RequestsBody = styled.div`
   padding-left: 0;
 `
 
+const RequestsContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 10px;
+`
+
 const ManageRequests = (props) => {
 
     const types = ["Sobrecupo"]
     const [requests, setRequests] = React.useState([])
+    const user = useContext(UserContext)
 
     // buscar de un rango de creación
     // buscar de un rango de update
     // buscar por tipo
     // buscar por ID de curso
-    
+
     const onClickSearch = async () => {
-        setRequests((await awsHelper.getAllRequests()).Items)
-        console.log(requests)
+        await setRequests((await awsHelper.getAllRequests()).Items)
     }
 
     const onClickAccept = async (id, requester_id, courseID) => {
@@ -122,10 +109,13 @@ const ManageRequests = (props) => {
         await awsHelper.updateRequest(body)
     }
 
+    useEffect(() => {
+        onClickSearch()
+    })
+
     return (
         <SectionContainer>
             <h3>Filtrar por:</h3>
-
 
             <RequestsSearchTable>
 
@@ -137,7 +127,7 @@ const ManageRequests = (props) => {
                     </Dropdown>
                     </td>
                 </tr>
-                <tr>
+                {/* <tr>
                     <th>Año</th>
                     <td>Desde 2000 hasta 2001</td>
                 </tr>
@@ -148,7 +138,7 @@ const ManageRequests = (props) => {
                 <tr>
                     <th>Codigo de curso</th>
                     <td><Input></Input></td>
-                </tr>
+                </tr> */}
 
             </RequestsSearchTable>
             <Button withIcon solid onClick={onClickSearch}>
@@ -158,25 +148,25 @@ const ManageRequests = (props) => {
 
             <RequestsBody>
 
+                <RequestsContainer>
+                    {requests.filter((aux) => aux.state == "sin_revisar").map(request => (
+                        <CourseCard>
+                            <RequestsTable>
+                                {/* la idea sería traer el nombre del estudiante a partir del id */}
 
-                {requests.map(request => (
-                    <CourseCard>
-                        <RequestsTable>
-                            {/* la idea sería traer el nombre del estudiante a partir del id */}
+                                <tr><h4>Fecha Peticion: </h4>{request.create_datetime.slice(0, 10)}</tr>
+                                <tr><h4>Hora Peticion: </h4>{request.create_datetime.slice(11, -5)}</tr>
+                                <tr><h4>Estudiante: </h4>{request.requester_id}</tr>
+                                <tr><h4>Estado: </h4>{request.state}</tr>
+                                <tr><h4>Tipo: </h4>{request.type}</tr>
+                                <Button solid onClick={e => onClickAccept(request.id, request.requester_id, request.courseID)}>Aceptar</Button>
+                                <Button solid onClick={e => onClickDeny(request.id)}>Rechazar</Button>
+                            </RequestsTable>
+                        </CourseCard>
 
-                            <tr>Fecha Peticion: {request.create_datetime.slice(0, 10)}</tr>
-                            <tr>Hora Peticion: {request.create_datetime.slice(11, -5)}</tr>
-                            <tr>Estudiante: {request.requester_id}</tr>
-                            <tr>Estado: {request.state}</tr>
-                            <tr>Tipo: {request.type}</tr>
-                            <Button solid onClick={e => onClickAccept(request.id, request.requester_id, request.courseID)}>Aceptar</Button>
-                            <Button solid onClick={e => onClickDeny(request.id)}>Rechazar</Button>
-                        </RequestsTable>
-                    </CourseCard>
+                    ))}
 
-                ))}
-
-
+                </RequestsContainer>
             </RequestsBody>
 
 

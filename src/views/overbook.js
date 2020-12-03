@@ -92,7 +92,7 @@ const Overbook = (props) => {
   const user = useContext(UserContext)
 
   const classes = useStyles();
-  
+
 
   const [open, setOpen] = React.useState(false);
 
@@ -104,42 +104,11 @@ const Overbook = (props) => {
     setOpen(false);
   };
 
-  
+
 
   const getCoursesByCode = async () => {
 
     setCourses(await awsHelper.getCourseByCode(courseCode))
-  }
-
-  const openModal = () => {
-    console.log("me abro")
-    return (
-
-      <div>
-        <button type="button" onClick={handleOpen}>
-          react-transition-group
-      </button>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          className={classes.modal}
-          open={open}
-          onClose={handleClose}
-          closeAfterTransition
-          BackdropComponent={Backdrop}
-          BackdropProps={{
-            timeout: 500,
-          }}
-        >
-          <Fade in={open}>
-            <div className={classes.paper}>
-              <h2 id="transition-modal-title">Transition modal</h2>
-              <p id="transition-modal-description">react-transition-group animates me.</p>
-            </div>
-          </Fade>
-        </Modal>
-      </div>
-    )
   }
 
 
@@ -154,7 +123,7 @@ const Overbook = (props) => {
       "state": "sin_revisar"
     }
     await awsHelper.putRequest(body)
-    return openModal()
+    handleOpen()
   }
 
   const onClickSearch = async () => {
@@ -206,6 +175,25 @@ const Overbook = (props) => {
                     </DivSchedule>
                   </CourseCardFooter>
                   <Button solid onClick={e => onClickOverbook(course.id, course.name)}>Pedir Sobrecupo</Button>
+                  <Modal
+                    aria-labelledby="Petición de sobrecupo!"
+                    aria-describedby="La petición ya está en la cola"
+                    className={classes.modal}
+                    open={open}
+                    onClose={handleClose}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                      timeout:4,
+                    }}
+                  >
+                    <Fade in={open}>
+                      <div className={classes.paper}>
+                        <h1 id="transition-modal-title">Petición exitosa!</h1>
+                        <p id="transition-modal-description">espere una respuesta por parte de su coordinador.</p>
+                      </div>
+                    </Fade>
+                  </Modal>
                 </CourseCard>
               )
 

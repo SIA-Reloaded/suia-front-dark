@@ -76,11 +76,6 @@ const ManageRequests = (props) => {
   const [requests, setRequests] = React.useState([])
   const user = useContext(UserContext)
 
-  // buscar de un rango de creación
-  // buscar de un rango de update
-  // buscar por tipo
-  // buscar por ID de curso
-
   const onClickSearch = async () => {
     setRequests((await awsHelper.getAllRequests()).Items)
   }
@@ -125,7 +120,6 @@ const ManageRequests = (props) => {
           </td>
         </tr>
 
-
       </RequestsSearchTable>
       <Button withIcon solid onClick={onClickSearch}>
         <i className="material-icons-round">search</i>
@@ -136,11 +130,8 @@ const ManageRequests = (props) => {
 
         <RequestsContainer>
           {requests.filter((aux) => aux.state == "sin_revisar").map(request => (
-
             <CourseCard>
               <RequestsTable>
-                {/* la idea sería traer el nombre del estudiante a partir del id */}
-
                 <tr><h4>Fecha Peticion: </h4>{request.create_datetime.slice(0, 10)}</tr>
                 <tr><h4>Hora Peticion: </h4>{request.create_datetime.slice(11, -5)}</tr>
                 <tr><h4>Estudiante: </h4>{request.requester_id}</tr>

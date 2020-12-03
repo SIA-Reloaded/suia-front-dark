@@ -2,6 +2,7 @@ import React from 'react'
 import Dropdown from '../components/drop-down';
 import styled from 'styled-components';
 import * as awsHelper from '../utilities/aws-helper';
+import { UserContext } from '../providers/user-provider'
 import { Bar } from 'react-chartjs-2';
 
 const Layout = styled.div`
@@ -54,8 +55,10 @@ const CalificacionDocente = () => {
   const [courseRates, setCourseRates] = React.useState([]);
   const [rates, setRates] = React.useState(null);
 
+  const user = React.useContext(UserContext)
+
   const getSemesters = async () => {
-    const responseRates = await awsHelper.getRates("20");
+    const responseRates = await awsHelper.getRates(user.userData.id);
     const academicCalendars = responseRates.map(
       (rate) => {
         return rate.academicCalendar;
@@ -69,8 +72,10 @@ const CalificacionDocente = () => {
       }
     )
     setCleanedSemesters(filteredSemesters)
-    setSemesterSelected(filteredSemesters[0].id)
     setRates(responseRates);
+    if (filteredSemesters.length>0) {
+      setSemesterSelected(filteredSemesters[0].id)
+    }
   }
 
   const loadCourses = async () => {
@@ -78,25 +83,36 @@ const CalificacionDocente = () => {
       (rate)=> rate.academicCalendar === semesterSelected
     )
 
+    if (coursesSemester.length > 0) {
 
-    const coursesPromises = coursesSemester.map( 
-      (rateSemester) => {
-        return awsHelper.getGroup(rateSemester.courseID);
-      }
-    )
+      const coursesIDs = [... new Set(coursesSemester.map( 
+          (rateSemester) => {
+            return rateSemester.courseID;
+          }
+        )
+      )];
 
-    const responseCourses = await Promise.all(coursesPromises);
-    setSemesterCourses(
-      responseCourses
-    );
-    setCourseSelected(responseCourses.length > 0 ? responseCourses[0] : '')
+      const coursesPromises = coursesIDs.map( 
+        (courseID) => {
+          return awsHelper.getGroup(courseID);
+        }
+      )
+
+      const responseCourses = await Promise.all(coursesPromises);
+      setSemesterCourses(
+        responseCourses
+      );
+      setCourseSelected(responseCourses.length > 0 ? responseCourses[0] : '')
+      console.log(responseCourses.length > 0)
+      getCourseRates();
+    }
   }
 
   //Contexto
   const getCourseRates = () =>{
     setCourseRates(
       rates.filter(
-        (rate)=> rate.academicCalendar === semesterSelected && rate.courseID === courseSelected
+        (rate)=> rate.academicCalendar === semesterSelected && rate.courseID === courseSelected.id
       )
     );
   }
@@ -118,7 +134,7 @@ const CalificacionDocente = () => {
 
   React.useEffect(
     ()=>{
-      if (courseSelected){
+      if (courseSelected && courseSelected !== ''){
         console.log('courseSelected')
         getCourseRates();
       }
@@ -217,7 +233,7 @@ const CalificacionDocente = () => {
     </Layout>
     <TeacherRateBody>
       <h3>{courseRates.length + (courseRates.length === 1 ? ' evaluación' : ' evaluaciones')}</h3>
-        { (rates && courseRates) &&
+        { ((rates && rates.length > 0) && (courseRates && courseRates.length > 0)) &&
          rates[0].questions.filter(
             (closeQuestion) => closeQuestion.options
           ).map(

@@ -9,16 +9,26 @@ const UserProvider = (props) => {
   const [user, setUser] = useState(undefined);
 
   useEffect(() => {
+    const setCurrentRole = (role) => {
+      setUser((usr) => {
+        const newUser = {...usr}
+        newUser.currentRole = role;
+        return newUser
+      })
+    }
+
     auth.onAuthStateChanged(async userAuth => {
       if (userAuth) {
+        console.log(userAuth)
         const username = userAuth.email.split('@')[0];
         const usrData = await getUserData(username)
         userAuth.userData = usrData
+        userAuth.setCurrentRole = setCurrentRole
+        userAuth.currentRole = usrData.roles[0]
       }
       setUser(userAuth);
     });
   }, [])
-
 
   return (
     <UserContext.Provider value={user}>

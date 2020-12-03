@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Dropdown from '../components/drop-down';
 import { Link } from 'react-router-dom';
 import * as awsHelper from "../utilities/aws-helper";
+import { UserContext } from '../providers/user-provider'
 
 const TeacherCoursesContainer = styled.div`
   width: 100%;
@@ -69,6 +70,8 @@ const TeacherCourses = (props) => {
   const [semesterCourses, setSemesterCourses] = React.useState([]);
   const [teacherGroups, setTeacherGroups] = React.useState([]);
 
+  const user = React.useContext(UserContext)
+
   React.useEffect(
     () => {
       getSemesters();
@@ -101,7 +104,7 @@ const TeacherCourses = (props) => {
 
   const getTeacherGroups = async () => {
     setTeacherGroups(
-      await awsHelper.getTeacherGroups("20")
+      await awsHelper.getTeacherGroups(user.userData.id)
     )
   }
 

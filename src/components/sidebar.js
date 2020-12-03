@@ -82,10 +82,6 @@ const SideBar = (props) => {
             <i className="material-icons-round">group_work</i>
             Grupos
           </StyledLink>
-          <StyledLink className={props.location.pathname === '/calificacion-docente' ? 'active' : ''} to={props.match.url + 'calificacion-docente'}>
-            <i className="material-icons-round">stars</i>
-            Calificacion Docente
-          </StyledLink>
         </React.Fragment>
       default:
         break;

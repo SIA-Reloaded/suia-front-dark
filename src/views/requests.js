@@ -17,11 +17,12 @@ const Requests = (props) => {
 
   const user = useContext(UserContext)
 
-  if (user.userData.roles.includes("ADMIN")) {
-    return <ManageRequests></ManageRequests>
-    
-  } else if (user.userData.roles.includes("STUDENT")) {
-    return <Overbook></Overbook>
+  switch (user.currentRole) {
+    case 'ADMIN':
+      return <ManageRequests></ManageRequests>
+    case 'STUDENT':
+      return <Overbook></Overbook>
+    default:
   }
 
 }

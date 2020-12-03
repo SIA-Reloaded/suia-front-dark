@@ -129,8 +129,16 @@ const Groups = (props) => {
       <tbody>
         {rows.map(row => {
           return <tr>
-            {row.rowRepresentation.map((data) => <td key={data} >{data}</td>)}
-            <td><Link to={props.match.url + '/detalle'}>Ver</Link></td>
+            {row.rowRepresentation.map((data, i) => <td key={data} >{data}</td>)}
+            <td><Link to={
+              {
+                pathname: props.match.url + '/detalle',
+                state: {
+                  group: row
+                }
+              }
+            }
+            >Ver</Link></td>
           </tr>
         })}
       </tbody>

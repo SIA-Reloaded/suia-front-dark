@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Button from '../components/button'
 
 const GroupDetails = (props) => {
+  console.log(props)
   return <GroupDetailsContainer>
     <Grid columns={2}>
       <div>
@@ -51,7 +52,7 @@ const GroupDetails = (props) => {
       </div>
 
       <div>
-      <b className='subtitle'>Horarios:</b>
+        <b className='subtitle'>Horarios:</b>
         <table className='data'>
           <tr>
             <td>Lunes:</td>

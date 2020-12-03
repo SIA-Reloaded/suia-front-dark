@@ -123,8 +123,7 @@ export const putStudentInCourseGroup = async (body) => {
   const response = await fetch(
     `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/admin/putStudentInCourseGroup`,
     {
-      method: "PUT",
-      mode: 'cors',
+      method: "POST",
       body: JSON.stringify(body),
     }
   )

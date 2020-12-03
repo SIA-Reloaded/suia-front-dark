@@ -7,6 +7,10 @@ import * as awsHelper from './../utilities/aws-helper'
 import styled from 'styled-components'
 import { UserContext } from '../providers/user-provider'
 
+import { makeStyles } from '@material-ui/core/styles';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
 
 const CourseInfo = styled.div`
   width: 100%;
@@ -67,6 +71,19 @@ const DivSchedule = styled.div`
   font-size: 80%;
   color: grey;
 `
+const useStyles = makeStyles((theme) => ({
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  paper: {
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
+}));
 
 const Overbook = (props) => {
 
@@ -74,9 +91,55 @@ const Overbook = (props) => {
   const [courseCode, setCourseCode] = React.useState(null)
   const user = useContext(UserContext)
 
+  const classes = useStyles();
+  
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  
+
   const getCoursesByCode = async () => {
 
     setCourses(await awsHelper.getCourseByCode(courseCode))
+  }
+
+  const openModal = () => {
+    console.log("me abro")
+    return (
+
+      <div>
+        <button type="button" onClick={handleOpen}>
+          react-transition-group
+      </button>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className={classes.modal}
+          open={open}
+          onClose={handleClose}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
+          }}
+        >
+          <Fade in={open}>
+            <div className={classes.paper}>
+              <h2 id="transition-modal-title">Transition modal</h2>
+              <p id="transition-modal-description">react-transition-group animates me.</p>
+            </div>
+          </Fade>
+        </Modal>
+      </div>
+    )
   }
 
 
@@ -91,6 +154,7 @@ const Overbook = (props) => {
       "state": "sin_revisar"
     }
     await awsHelper.putRequest(body)
+    return openModal()
   }
 
   const onClickSearch = async () => {

@@ -96,11 +96,6 @@ const ManageRequests = (props) => {
 
     await awsHelper.updateRequest(bodyUpdateRequest)
 
-    const bodyPutStudentInCourseGroup = {
-      requester_id: requester_id,
-      courseID: courseID
-    }
-    await awsHelper.putStudentInCourseGroup(bodyPutStudentInCourseGroup)
   }
 
   const onClickDeny = async (id) => {

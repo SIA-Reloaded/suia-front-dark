@@ -44,4 +44,15 @@ const StyledButton = styled.button`
     `}
 `;
 
+export const ListButton = styled.button`
+  background-color: transparent;
+  background-color: ${(props) =>
+    props.solid ? props.theme.colors.primary : "transparent"};
+  border: none;
+  border-bottom: solid 1px black;
+  margin-bottom: 8px;
+  padding: 8px;
+  text-align: left;
+`
+
 export default StyledButton;

@@ -11,7 +11,7 @@ const UserProvider = (props) => {
   useEffect(() => {
     const setCurrentRole = (role) => {
       setUser((usr) => {
-        const newUser = {...user}
+        const newUser = {...usr}
         newUser.currentRole = role;
         return newUser
       })
@@ -23,6 +23,7 @@ const UserProvider = (props) => {
         const username = userAuth.email.split('@')[0];
         const usrData = await getUserData(username)
         userAuth.userData = usrData
+        userAuth.setCurrentRole = setCurrentRole
         userAuth.currentRole = usrData.roles[0]
       }
       setUser(userAuth);

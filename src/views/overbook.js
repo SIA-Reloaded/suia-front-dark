@@ -4,6 +4,7 @@ import Dropdown from './../components/drop-down'
 import Button from './../components/button'
 import Input from './../components/input'
 import * as awsHelper from './../utilities/aws-helper'
+import { parseShedule } from '../utilities/date-helper';
 import styled from 'styled-components'
 import { UserContext } from '../providers/user-provider'
 
@@ -154,8 +155,8 @@ const Overbook = (props) => {
                     </Div>
 
                     <Div>
-                      {course.schedule.map((schedule) => (
-                        <li className={schedule.day}>{schedule.day} {schedule.startHours} {schedule.endHours}</li>
+                      {parseShedule(course.schedule).map((schedule) => (
+                        <p className={schedule.day}>{schedule.day} {schedule.hours}</p>
                           )
                         )
                       }

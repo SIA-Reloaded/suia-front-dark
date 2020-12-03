@@ -17,7 +17,7 @@ const CourseCard = styled.div`
   margin-bottom: 0px;
   background-color: ${(props) => props.theme.colors.gray[4]};
   padding: 5px;
-  height: 250px;
+  align-self: start;
   border-radius: 15px;
   h4 {
     margin: 0;

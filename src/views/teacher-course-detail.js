@@ -229,11 +229,13 @@ const TeacherCourseDetail = (props) => {
   const getGrades = async () => {
     const responseGrades = await awsHelper.getGroupGrades(props.match.params.courseID);
     setGrades(responseGrades);
-    setLastGrades(
-      responseGrades.reduce(
-        (x, y) => x.update_datetime > y.update_datetime ? x : y
-      )
-    );
+    if (responseGrades.length > 0) {
+      setLastGrades(
+        responseGrades.reduce(
+          (x, y) => x.update_datetime > y.update_datetime ? x : y
+        )
+      );
+    }
   }
 
   const onItemChange = (e) => {
@@ -325,7 +327,9 @@ const TeacherCourseDetail = (props) => {
                     const rowGrade = student.grades.find(
                       (grade) => grade.grade_id === item.id
                     );
-                    return acc + ((item.percentage/100)*rowGrade.grade)
+                    if (rowGrade) {
+                      return acc + ((item.percentage/100)*rowGrade.grade)
+                    }
                   },
                   0
                 )
@@ -334,7 +338,10 @@ const TeacherCourseDetail = (props) => {
               const rowGrade = student.grades.find(
                 (grade) => grade.grade_id === tableRow
               );
-              studentRow.push(rowGrade.grade)
+              if (rowGrade) {
+                console.log("rowGrade", rowGrade)
+                studentRow.push(rowGrade.grade)
+              }
             }
           }
         );
@@ -599,7 +606,7 @@ const TeacherCourseDetail = (props) => {
       contentLabel="Notas"
     >
       <h2>Notas</h2>
-      {(lastGrades && students) && renderGradesTable()}
+      {(lastGrades && students) && 'Notas'}
     </Modal>
     <Modal
       isOpen={updateGradesModalIsOpen}

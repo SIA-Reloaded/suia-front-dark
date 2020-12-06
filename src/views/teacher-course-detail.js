@@ -136,6 +136,11 @@ const GradesTable = styled.table`
   text-align: center;
 
   tr {
+    th {
+      &:not(:last-child) {
+        padding: 15px 10px 15px 0;
+      }
+    }
     td {
       &:not(:last-child) {
         padding: 15px 10px 15px 0;
@@ -147,8 +152,6 @@ const GradesTable = styled.table`
 
 const TeacherCourseDetail = (props) => {
   const [course, setCourse] = React.useState(undefined);
-  const [teacher, setTeacher] = React.useState(undefined);
-  const [loading, setLoading] = React.useState(false);
   const [grades, setGrades] = React.useState(undefined);
   const [lastGrades, setLastGrades] = React.useState(undefined);
   const [downloadTemplateModalIsOpen,setDownloadTemplateIsOpen] = React.useState(false);
@@ -196,8 +199,7 @@ const TeacherCourseDetail = (props) => {
   )
 
   React.useEffect(
-    () => {
-      setLoading(false);
+    () => {      
       if (course) {
         getStudents();
         getGrades();
@@ -206,8 +208,7 @@ const TeacherCourseDetail = (props) => {
     [course]
   );
 
-  const getCourse = async () => {
-    setLoading(true);
+  const getCourse = async () => {    
     const courseResponse = await awsHelper.getGroup(props.match.params.courseID);
     setCourse(courseResponse);
   }
@@ -227,6 +228,7 @@ const TeacherCourseDetail = (props) => {
   }
 
   const getGrades = async () => {
+    setLastGrades(null);
     const responseGrades = await awsHelper.getGroupGrades(props.match.params.courseID);
     setGrades(responseGrades);
     if (responseGrades.length > 0) {
@@ -267,7 +269,7 @@ const TeacherCourseDetail = (props) => {
       {header: 'Total', key: 'total'},
     ];
     const percentageRowArray = gradeItems.map(
-      (gradeItem) => [gradeItem.name.replace(/\s/g, '').toLowerCase(), `${gradeItem.percentage}%`]
+      (gradeItem) => [gradeItem.name.replace(/\s/g, '').toLowerCase(), gradeItem.percentage/100]
     );
     sheet.addRow(
       Object.fromEntries(percentageRowArray)
@@ -307,6 +309,9 @@ const TeacherCourseDetail = (props) => {
           cell.alignment = {
             vertical: 'middle', horizontal: 'center'
           };
+          if (rowNumber === 2) {
+            cell.numFmt = '0.00%';
+          }
         } else if (colNumber >= 3) {
           cell.numFmt = '';
         }
@@ -358,18 +363,17 @@ const TeacherCourseDetail = (props) => {
                       (grade) => grade.grade_id === item.id
                     );
                     if (rowGrade) {
-                      return acc + ((item.percentage/100)*rowGrade.grade)
+                      return acc + item.percentage*rowGrade.grade
                     }
                   },
                   0
-                )
+                ).toFixed(3)
               );
             } else {
               const rowGrade = student.grades.find(
                 (grade) => grade.grade_id === tableRow
               );
               if (rowGrade) {
-                console.log("rowGrade", rowGrade)
                 studentRow.push(rowGrade.grade)
               }
             }
@@ -388,7 +392,7 @@ const TeacherCourseDetail = (props) => {
           <th>Nombre</th>
           {
             lastGrades.grade_items.map(
-              (item) => <th>{item.label} - {item.percentage}%</th>
+              (item) => <th>{item.label} - {item.percentage*100}%</th>
             )
           }
           <th>Total</th>
@@ -420,12 +424,10 @@ const TeacherCourseDetail = (props) => {
       wb.xlsx.load(buffer).then(async workbook => {
         let grade_items = [];
         let grades = [];
-        let grades_mapper = [];
         let totalIndex;
         const firstItemIdx = 3;
         workbook.eachSheet((sheet, id) => {
           sheet.eachRow((row, rowIndex) => {
-            console.log(rowIndex);
             if(rowIndex === 1) {
               totalIndex = row.values.indexOf('Total');
               grade_items = row.values.slice(firstItemIdx, totalIndex).map(
@@ -435,23 +437,6 @@ const TeacherCourseDetail = (props) => {
                   id: uuid.v1(),
                 })
               );
-              // row.values.slice(3, totalIndex)
-              // const totalIndex = row.values.indexOf('Total');
-              // const items_header = row.values.slice(3, totalIndex);
-              // grade_items = items_header.map(
-              //   (item) => {
-              //     console.log(item);
-              //     const parts = item.split(' - ');
-              //     console.log(parts);
-              //     const id = uuid.v1();
-              //     grades_mapper[row.values.indexOf(item)] = id;
-              //     return {
-              //       percentage: parseFloat((parts[1]).slice(0,-1)),
-              //       label: parts[0],
-              //       id
-              //     }
-              //   }
-              // )
             } else if (rowIndex === 2) {
               row.values.slice(firstItemIdx, totalIndex).forEach(
                 (item, idx) => {
@@ -471,7 +456,6 @@ const TeacherCourseDetail = (props) => {
                 student_id: row.values[1],
                 grades: student_grades_clean.map(
                   (grade, idx) => {
-                    console.log("grade", grade)
                     const gradeItem = grade_items.find(
                       (gradeItem) => gradeItem.colNumber === idx
                     );
@@ -482,7 +466,6 @@ const TeacherCourseDetail = (props) => {
                   }
                 )
               }
-              console.log("student_grade_obj", student_grade_obj)
               grades.push(student_grade_obj)
             }
           })
@@ -496,7 +479,8 @@ const TeacherCourseDetail = (props) => {
           grade_items: clean_grade_items,
           grades
         })
-        console.log(response);
+        getGrades();
+        closeUpdateGradesModal();
       })
     }
   }
@@ -672,7 +656,7 @@ const TeacherCourseDetail = (props) => {
       contentLabel="Notas"
     >
       <h2>Notas</h2>
-      {(lastGrades && students) && 'Notas'}
+      {(lastGrades && students) && renderGradesTable()}
     </Modal>
     <Modal
       isOpen={updateGradesModalIsOpen}

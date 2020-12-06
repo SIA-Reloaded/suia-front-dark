@@ -421,12 +421,21 @@ const TeacherCourseDetail = (props) => {
         let grade_items = [];
         let grades = [];
         let grades_mapper = [];
+        let totalIndex;
+        const firstItemIdx = 3;
         workbook.eachSheet((sheet, id) => {
           sheet.eachRow((row, rowIndex) => {
             console.log(rowIndex);
             if(rowIndex === 1) {
-              const totalIndex = row.values.indexOf('Total');
-              console.log("row values", row.values.slice(3, totalIndex))
+              totalIndex = row.values.indexOf('Total');
+              grade_items = row.values.slice(firstItemIdx, totalIndex).map(
+                (item, idx) => ({
+                  label: item,
+                  colNumber: idx,
+                  id: uuid.v1(),
+                })
+              );
+              // row.values.slice(3, totalIndex)
               // const totalIndex = row.values.indexOf('Total');
               // const items_header = row.values.slice(3, totalIndex);
               // grade_items = items_header.map(
@@ -443,32 +452,51 @@ const TeacherCourseDetail = (props) => {
               //     }
               //   }
               // )
+            } else if (rowIndex === 2) {
+              row.values.slice(firstItemIdx, totalIndex).forEach(
+                (item, idx) => {
+                  const itemIdx = grade_items.findIndex(
+                    (gradeItem) => gradeItem.colNumber === idx
+                  );
+                  grade_items[itemIdx].percentage= item;
+                }
+              );
             } else {
-              const student_grades = row.values.slice(3, grade_items.length+3);
-              grades.push({
+              const student_grades_raw = row.values.slice(firstItemIdx, totalIndex);
+              const student_grades_clean = []
+              for(let i = 0; i < student_grades_raw.length; i++) {
+                student_grades_clean.push(parseFloat(student_grades_raw[i]) || 0)
+              }
+              const student_grade_obj = {
                 student_id: row.values[1],
-                grades: student_grades.map(
-                  (grade) => ({
-                    grade_id: grades_mapper[row.values.indexOf(grade)],
-                    grade
-                  })
+                grades: student_grades_clean.map(
+                  (grade, idx) => {
+                    console.log("grade", grade)
+                    const gradeItem = grade_items.find(
+                      (gradeItem) => gradeItem.colNumber === idx
+                    );
+                    return {
+                      grade_id: gradeItem.id,
+                      grade: parseFloat(grade) || 0
+                    }
+                  }
                 )
-              })
+              }
+              console.log("student_grade_obj", student_grade_obj)
+              grades.push(student_grade_obj)
             }
           })
         })
-        console.log("grade_items", grade_items);
-        console.log("grades", grades);
-        console.log("grades_mapper", grades_mapper);
-
-        /*
+        const clean_grade_items = grade_items.map((item) => {
+          const {colNumber, ...clean_item} = item;
+          return clean_item
+        });
         const response = await awsHelper.putStudentGrades({
           course_id: course.id,
-          grade_items,
+          grade_items: clean_grade_items,
           grades
         })
         console.log(response);
-        */
       })
     }
   }

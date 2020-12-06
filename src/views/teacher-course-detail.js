@@ -259,16 +259,22 @@ const TeacherCourseDetail = (props) => {
       {header: 'Nombre', key: 'name'},
       ...gradeItems.map(
         (gradeItem) => ({
-          header: `${gradeItem.name} - ${gradeItem.percentage}%`,
+          header: `${gradeItem.name}`,
           key: gradeItem.name.replace(/\s/g, '').toLowerCase(),
-          width: `${gradeItem.name} - ${gradeItem.percentage}%`.length + padding
+          width: `${gradeItem.name}`.length + padding
         })
       ),
       {header: 'Total', key: 'total'},
     ];
+    const percentageRowArray = gradeItems.map(
+      (gradeItem) => [gradeItem.name.replace(/\s/g, '').toLowerCase(), `${gradeItem.percentage}%`]
+    );
+    sheet.addRow(
+      Object.fromEntries(percentageRowArray)
+    );
     let maxIDWidth=0, maxNameWidth=0;
     students.forEach((student, idx) => {
-      const currentRow = idx+2;
+      const currentRow = idx+3;
       const gradeFormulas = gradeItems.map((item, idx2) => `(${getColumnLetter(idx2+2)}${currentRow}*${parseFloat(item.percentage)/100})`);
       const name = student.basicData.firstName + ' ' + student.basicData.lastName;
       maxIDWidth = student.id.length > maxIDWidth ? student.id.length : maxIDWidth;
@@ -282,6 +288,30 @@ const TeacherCourseDetail = (props) => {
         }
       })
     });
+    sheet.eachRow({ includeEmpty: true }, function(row, rowNumber){
+      row.eachCell(function(cell, colNumber) {
+        cell.font = {
+          name: 'Arial',
+          family: 2,
+          bold: false,
+          size: 10,
+        };
+        if (rowNumber <= 2) {
+          row.height = 20;
+          cell.font = {
+            name: 'Arial',
+            family: 2,
+            bold: true,
+            size: 11,
+          } 
+          cell.alignment = {
+            vertical: 'middle', horizontal: 'center'
+          };
+        } else if (colNumber >= 3) {
+          cell.numFmt = '';
+        }
+      });
+    });
     sheet.getColumn('id').width = maxIDWidth + padding;
     sheet.getColumn('name').width = maxNameWidth + padding;
     workbook.xlsx.writeBuffer().then(function (data) {
@@ -291,7 +321,7 @@ const TeacherCourseDetail = (props) => {
       const blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
       const url = window.URL.createObjectURL(blob);
       a.href = url;
-      a.download = "grades.xslx";
+      a.download = `grades-${ course.name.toLowerCase().split(' ').join('-') }.xslx`;
       a.click();
       window.URL.revokeObjectURL(url);
       closeDownloadTemplateModal();
@@ -396,21 +426,23 @@ const TeacherCourseDetail = (props) => {
             console.log(rowIndex);
             if(rowIndex === 1) {
               const totalIndex = row.values.indexOf('Total');
-              const items_header = row.values.slice(3, totalIndex);
-              grade_items = items_header.map(
-                (item) => {
-                  console.log(item);
-                  const parts = item.split(' - ');
-                  console.log(parts);
-                  const id = uuid.v1();
-                  grades_mapper[row.values.indexOf(item)] = id;
-                  return {
-                    percentage: parseFloat((parts[1]).slice(0,-1)),
-                    label: parts[0],
-                    id
-                  }
-                }
-              )
+              console.log("row values", row.values.slice(3, totalIndex))
+              // const totalIndex = row.values.indexOf('Total');
+              // const items_header = row.values.slice(3, totalIndex);
+              // grade_items = items_header.map(
+              //   (item) => {
+              //     console.log(item);
+              //     const parts = item.split(' - ');
+              //     console.log(parts);
+              //     const id = uuid.v1();
+              //     grades_mapper[row.values.indexOf(item)] = id;
+              //     return {
+              //       percentage: parseFloat((parts[1]).slice(0,-1)),
+              //       label: parts[0],
+              //       id
+              //     }
+              //   }
+              // )
             } else {
               const student_grades = row.values.slice(3, grade_items.length+3);
               grades.push({
@@ -425,12 +457,18 @@ const TeacherCourseDetail = (props) => {
             }
           })
         })
+        console.log("grade_items", grade_items);
+        console.log("grades", grades);
+        console.log("grades_mapper", grades_mapper);
+
+        /*
         const response = await awsHelper.putStudentGrades({
           course_id: course.id,
           grade_items,
           grades
         })
         console.log(response);
+        */
       })
     }
   }

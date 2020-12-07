@@ -11,7 +11,6 @@ const verboseDay = (day, abbr) => {
   const dayListAbbr = ['lu.', 'ma.', 'mi.', 'ju.', 'vi.', 'sá.', 'do.'];
   const dayList = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   const selectedList = abbr ? dayListAbbr : dayList;
-  console.log(selectedList);
   switch(day) {
     case 'MO':
       return selectedList[0];

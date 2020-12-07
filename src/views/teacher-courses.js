@@ -135,7 +135,7 @@ const TeacherCourses = (props) => {
         semesterCourses.map(
           (course) => (
             <CourseCard>
-              <Link to={`/dashboard/profesor/curso/${course.id}`}><h3>{course.name}</h3></Link>
+              <Link to={`/profesor/curso/${course.id}`}><h3>{course.name}</h3></Link>
               <CourseCardFooter>
                 <p className="groups">2 grupos</p>
                 <p className="students">{course.students.length} estudiantes</p>

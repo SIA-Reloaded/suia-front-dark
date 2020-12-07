@@ -38,6 +38,7 @@ export default class Group {
   get rowRepresentation1() {
     console.log(this.code)
     console.log(this.teacher?.name || 'No asignado')
+    
     return [
       this.code,
       this.group,
@@ -45,6 +46,7 @@ export default class Group {
       this.teacher?.name || 'No asignado',
       this.classroom,
       this.scheduleStringRepresentation,
+      [],
     ];
   }
 

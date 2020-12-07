@@ -10,11 +10,14 @@ const GroupsTable = styled.table`
   text-align: center;
   margin-left: 30px;
   margin-top: 15px;
-
-  tr {
+  tr {  
     td {
       &:not(:last-child) {
         padding: 15px 10px 15px 15px;
+        color: #565A5C;
+        border-bottom-style: dashed;
+        border-bottom-width: 1px;
+        border-bottom-color: gray;     
       }
     }
   }
@@ -44,7 +47,6 @@ const StudentCourses = (props) => {
     ()=>{
         if (studentCoursesList){
         getCourses();
-        
         }
     }, [studentCoursesList]
     );
@@ -52,8 +54,7 @@ const StudentCourses = (props) => {
     React.useEffect(
       ()=>{
           if (coursesGroup){
-          getRows();
-          
+          getRows();         
           }
       }, [coursesGroup]
       );
@@ -95,35 +96,37 @@ const StudentCourses = (props) => {
         size ="20px"
         >Cursos inscritos</Text>
         <GroupsTable>
-      <thead>
-        <tr>
-          <th>
-            CÓDIGO
-          </th>
-          <th>
-            GRUPO
-          </th>
-          <th> 
-            MATERIA
-          </th>
-          <th>
-            PROFESOR
-          </th>
-          <th>
-            SALÓN
-          </th>
-          <th>
-            HORARIO
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map(row => {
-          return <tr>
-            {row.rowRepresentation1.map((data, i) => <td key={data} >{data}</td>)}
+        <thead>
+          <tr>
+            <th>
+              CÓDIGO
+            </th>
+            <th>
+              GRUPO
+            </th>
+            <th> 
+              MATERIA
+            </th>
+            <th>
+              PROFESOR
+            </th>
+            <th>
+              SALÓN
+            </th>
+            <th>
+              HORARIO
+            </th>
           </tr>
-        })}
-      </tbody>
+        </thead>
+        <tbody>
+          {rows.map(row => {
+            return <tr>
+              {row.rowRepresentation1.map((data, i) => <td key={data} >{data}</td>)}
+            </tr>
+              }
+            )
+          }
+        </tbody>
     </GroupsTable>
     </div>
     

@@ -95,7 +95,7 @@ const StudentCourses = (props) => {
         <Text 
         size ="20px"
         >Cursos inscritos</Text>
-        <GroupsTable>
+        {studentCoursesList.length>0 && <GroupsTable>
         <thead>
           <tr>
             <th>
@@ -127,7 +127,7 @@ const StudentCourses = (props) => {
             )
           }
         </tbody>
-    </GroupsTable>
+    </GroupsTable>}
     </div>
     
 }

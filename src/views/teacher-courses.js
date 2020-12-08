@@ -129,17 +129,17 @@ const TeacherCourses = (props) => {
         }
       </Dropdown>
     </TeacherCoursesHeader>
-      <h4>{ semesterCourses.length } resultado{semesterCourses.length>1 ? 's' : ''}</h4>
+    <h4>{semesterCourses.length} resultado{semesterCourses.length > 1 ? 's' : ''}</h4>
     <TeacherCoursesBody>
       {
         semesterCourses.map(
           (course) => (
             <CourseCard>
-              <Link to={`/dashboard/profesor/curso/${course.id}`}><h3>{course.name}</h3></Link>
+              <Link to={`/profesor/curso/${course.id}`}><h3>{course.name}</h3></Link>
               <CourseCardFooter>
                 <p className="groups">2 grupos</p>
                 <p className="students">{course.students.length} estudiantes</p>
-                <p className="code">{ course.code }</p>
+                <p className="code">{course.code}</p>
               </CourseCardFooter>
             </CourseCard>
           )

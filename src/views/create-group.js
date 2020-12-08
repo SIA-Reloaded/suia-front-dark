@@ -10,6 +10,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import { CenteredLoader } from '../components/loader';
 import { Redirect } from "react-router";
+import ScheduleSelect from "../components/schedule-selector";
 
 const CreateGroupLayout = styled.div`
   display: flex;
@@ -68,26 +69,38 @@ const AutocompleteContainer = styled.div`
   }
 `
 
+const EmptyCouse = {
+  code: "",
+  name: "",
+}
+
 const CreateGroup = (props) => {
-  const [courses, setCourses] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState("");
-  const [selectedCourseCode, setselectedCourseCode] = useState("");
+  const [courses, setCourses] = useState([EmptyCouse]);
+  const [selectedCourse, setSelectedCourse] = useState(EmptyCouse);
+  const [selectedCourseCode, setselectedCourseCode] = useState(EmptyCouse);
   const [discObli, setDiscObli] = useState(0);
   const [discOpta, setDiscOpta] = useState(0);
   const [fund, setFund] = useState(0);
   const [libre, setLibre] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [mustNavigate, setMustNavigate] = useState(false);
-  const [shedule, setShedule] = useState([
+  const [schedule, setSchedule] = useState([
     { day: "", startHours: "", endHours: "" },
   ]);
 
-
   useEffect(() => {
     awsHelper.getCourses().then((data) => {
-      setCourses(data)
+      setCourses([EmptyCouse, ...data])
     });
   }, [])
+
+  const onSelectChange = (schedule, id) => {
+    setSchedule((oldSchedule) => {
+      const newSchedule = [...oldSchedule];
+      newSchedule[id] = schedule;
+      return newSchedule;
+    });
+  }
 
   const saveGroup = async () => {
     setIsLoading(true)
@@ -102,29 +115,20 @@ const CreateGroup = (props) => {
         freeElection: parseInt(libre),
       },
       1,
-      shedule,
+      schedule,
       "Ingeniería - 401",
       [],
       null
     );
 
     await createGroup(group);
-    console.log("lala")
     setMustNavigate(true)
   };
 
-  const onSessionChange = (e) => {
-    setShedule((oldShedule) => {
-      const sessionId = parseInt(e.target.name.split("-")[2]);
-      const sessionKey = e.target.name.split("-")[1];
-      const newShedule = [...oldShedule];
-      newShedule[sessionId][sessionKey] = e.target.value;
-      return newShedule;
-    });
-  };
 
-  if ( mustNavigate) return <Redirect to='/grupos'/>;
-  if ( isLoading ) return <CenteredLoader/>;
+
+  if (mustNavigate) return <Redirect to='/grupos' />;
+  if (isLoading) return <CenteredLoader />;
 
   return (
     <CreateGroupLayout>
@@ -136,12 +140,11 @@ const CreateGroup = (props) => {
             <Autocomplete
               value={selectedCourse}
               onChange={(event, newValue) => {
-                console.log(newValue)
                 setSelectedCourse(newValue);
                 setselectedCourseCode(newValue);
               }}
               options={courses}
-              getOptionLabel={(option) => option.name || ''}
+              getOptionLabel={(option) => option.name}
               renderInput={(params) => (
                 <div ref={params.InputProps.ref}>
                   <Input width="250px" type="text" {...params.inputProps} placeholder='Nombre' />
@@ -151,7 +154,6 @@ const CreateGroup = (props) => {
             <Autocomplete
               value={selectedCourseCode}
               onChange={(event, newValue) => {
-                console.log(newValue)
                 setSelectedCourse(newValue);
                 setselectedCourseCode(newValue);
               }}
@@ -205,34 +207,12 @@ const CreateGroup = (props) => {
               parseInt(libre)}
           </div>
           <h3>Horarios:</h3>
-          {shedule.map((row, i) => (
-            <div key={i} className="form-group">
-              <Input
-                type="text"
-                smallBorder
-                placeholder="Day"
-                name={"session-day-" + i}
-                onChange={onSessionChange}
-              />
-              <Input
-                type="text"
-                smallBorder
-                placeholder="Start hour"
-                name={"session-startHours-" + i}
-                onChange={onSessionChange}
-              />
-              <Input
-                type="text"
-                smallBorder
-                placeholder="End hour"
-                name={"session-endHours-" + i}
-                onChange={onSessionChange}
-              />
-            </div>
+          {schedule.map((row, i) => (
+            <ScheduleSelect key={i} id={i} onChange={onSelectChange}></ScheduleSelect>
           ))}
           <Button
             alt
-            onClick={() => setShedule([...shedule, { day: "", hour: "" }])}
+            onClick={() => setSchedule([...schedule, { day: "", hour: "" }])}
           >
             Añadir horario
           </Button>

@@ -101,7 +101,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
   },
   paper: {
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: '#DFDFDF',
     border: '2px solid #000',
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
@@ -117,16 +117,34 @@ const Overbook = (props) => {
   const classes = useStyles();
 
 
-  const [open, setOpen] = React.useState(false);
+  const [openConfirmation, setopenConfirmation] = React.useState(false);
+  const [openDenial, setopenDenial] = React.useState(false);
+  const [openOverbook, setopenOverbook] = React.useState(false);
 
-  const handleOpen = () => {
-    setOpen(true);
+  const handleopenConfirmation = () => {
+    setopenConfirmation(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setopenConfirmation(false);
   };
 
+  const handleopenDenial = () => {
+    setopenDenial(true);
+  };
+
+  const handleCloseDenial = () => {
+    setopenDenial(false);
+  };
+
+
+  const handleopenOverbook = () => {
+    setopenOverbook(true);
+  };
+
+  const handleCloseOverbook = () => {
+    setopenOverbook(false);
+  };
 
 
   const getCoursesByCode = async () => {
@@ -134,19 +152,58 @@ const Overbook = (props) => {
     setCourses(await awsHelper.getCourseByCode(courseCode))
   }
 
+  // se asume que el curso ya existe
+  const isCourseEnrolled = async (courseID) => {
+    let value = true
+    await awsHelper.getGroup(courseID).then(res => {
+      console.log("inside course enrolled:", res.students)
+      if (res)
+        if (!res.students.includes(user.userData.id))
+          value = false
+    })
+
+    return value
+  }
+
+  const isAlreadyOverbookPetition = async (courseID) => {
+    let value = false
+    const requester_id = user.userData.id
+    await awsHelper.getRequestsByCourseAndRequesterId(courseID, requester_id).then(res => {
+      console.log("inside request:", res)
+      if (res.length > 0) {
+        value = true
+        console.log("entra con que el arreglo es mayora  cero")
+      }
+    })
+
+    return value
+  }
 
   // genera la peticion de sobrecupo
   // faltaria poner el requester id (primer parametro de la funcion)
-  const onClickOverbook = async (courseId, courseName) => {
-    const body = {
-      "requester_id": user.userData.id,
-      "courseID": courseId,
-      "courseName": courseName,
-      "type": "sobrecupo",
-      "state": "sin_revisar"
-    }
-    await awsHelper.putRequest(body)
-    handleOpen()
+  const onClickOverbook = async (courseID, courseName) => {
+    isCourseEnrolled(courseID).then(async isCourseEnrolledAux => {
+      if (!isCourseEnrolledAux) {
+        isAlreadyOverbookPetition(courseID).then(async isAlreadyOverbookPetitionAux => {
+          if (!isAlreadyOverbookPetitionAux) {
+            const body = {
+              "requester_id": user.userData.id,
+              "courseID": courseID,
+              "courseName": courseName,
+              "type": "sobrecupo",
+              "state": "sin_revisar"
+            }
+            await awsHelper.putRequest(body)
+            handleopenConfirmation()
+          } else {
+            console.log("ya tiene sobrecupo de este curso")
+            handleopenOverbook()
+          }
+        })
+      } else {
+        handleopenDenial()
+      }
+    })
   }
 
   const onClickSearch = async () => {
@@ -158,9 +215,9 @@ const Overbook = (props) => {
       <h1>Sobrecupo</h1>
 
       <div>
-        <Text 
-        size ="19px"
-        color = "#565A5C">Ingrese el código de la matería</Text>
+        <Text
+          size="19px"
+          color="#565A5C">Ingrese el código de la matería</Text>
       </div>
       <Div2>
         <Input
@@ -183,20 +240,20 @@ const Overbook = (props) => {
                 <CourseCard>
                   <h3>{course["name"]}</h3>
                   <CourseCardFooter>
-                    <Div marginBottom ="20px">
-                    <p className="classroom">{course["classroom"]}</p>
+                    <Div marginBottom="20px">
+                      <p className="classroom">{course["classroom"]}</p>
                     </Div>
 
                     <Div>
                       {parseShedule(course.schedule).map((schedule) => (
                         <p className={schedule.day}>{schedule.day} {schedule.hours}</p>
-                          )
-                        )
+                      )
+                      )
                       }
                     </Div>
-                    <DivSchedule 
-                    marginBottom = "10px"
-                    marginTop="15px">
+                    <DivSchedule
+                      marginBottom="10px"
+                      marginTop="15px">
                       <li type="square">Elección Libre - {course.capacityDistribution.freeElection}</li>
                       <li type="square">Fundamentación - {course.capacityDistribution.fundamentation}</li>
                       <li type="square"> Obligatoria Opcional - {course.capacityDistribution.disciplinaryOptional}</li>
@@ -205,21 +262,62 @@ const Overbook = (props) => {
                   </CourseCardFooter>
                   <Button solid onClick={e => onClickOverbook(course.id, course.name)}>Solicitar sobrecupo</Button>
                   <Modal
-                    aria-labelledby="Petición de sobrecupo!"
-                    aria-describedby="La petición ya está en la cola"
+                    aria-labelledby="Petición exitosa!"
+                    aria-describedby="espere una respuesta por parte de su coordinador."
                     className={classes.modal}
-                    open={open}
+                    open={openConfirmation}
                     onClose={handleClose}
                     closeAfterTransition
                     BackdropComponent={Backdrop}
                     BackdropProps={{
-                      timeout:4,
+                      timeout: 4,
                     }}
                   >
-                    <Fade in={open}>
+                    <Fade in={openConfirmation}>
                       <div className={classes.paper}>
                         <h1 id="transition-modal-title">Petición exitosa!</h1>
                         <p id="transition-modal-description">espere una respuesta por parte de su coordinador.</p>
+                      </div>
+                    </Fade>
+                  </Modal>
+
+
+                  <Modal
+                    aria-labelledby="Error!"
+                    aria-describedby="Petición denegada"
+                    className={classes.modal}
+                    open={openDenial}
+                    onClose={handleCloseDenial}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                      timeout: 4,
+                    }}
+                  >
+                    <Fade in={openDenial}>
+                      <div className={classes.paper}>
+                        <h1 id="transition-modal-title">Curso inscrito!</h1>
+                        <p id="transition-modal-description">Revise sus cursos inscritos.</p>
+                      </div>
+                    </Fade>
+                  </Modal>
+
+                  <Modal
+                    aria-labelledby="Petición de sobrecupo!"
+                    aria-describedby="espere una respuesta por parte de su coordinador."
+                    className={classes.modal}
+                    open={openOverbook}
+                    onClose={handleCloseOverbook}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                      timeout: 4,
+                    }}
+                  >
+                    <Fade in={openOverbook}>
+                      <div className={classes.paper}>
+                        <h1 id="transition-modal-title">Previo ticket encontrado!</h1>
+                        <p id="transition-modal-description">Ticket se encuentra en revisión.</p>
                       </div>
                     </Fade>
                   </Modal>

@@ -1,11 +1,15 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import SectionContainer from '../components/section-container'
 import Dropdown from './../components/drop-down'
 import Button from './../components/button'
 import * as awsHelper from './../utilities/aws-helper'
 import styled from 'styled-components'
+import { makeStyles } from '@material-ui/core/styles';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
 
-import { UserContext } from '../providers/user-provider'
+
 
 
 const CourseCard = styled.div`
@@ -27,22 +31,21 @@ const CourseCard = styled.div`
 `
 
 const RequestsSearchTable = styled.table`
-    width: 40%;
+    width: 20%;
     text-align: center;
 
     tr {
         td {
             &:not(:last-child) {
-            padding: 15px 10px 15px 0;
+            padding: 10px 10px 10px 0;
             }
         }
     }
 `;
 
 const RequestsTable = styled.table`
-    width: 100%;
+    width: 80%;
     text-align: center;
-
     tr {
         td {
             &:not(:last-child) {
@@ -68,20 +71,61 @@ const RequestsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   padding-top: 10px;
+
+`
+
+const useStyles = makeStyles((theme) => ({
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  paper: {
+    backgroundColor: '#DFDFDF',
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
+}));
+
+
+const Div = styled.div`
+  display: flex;
+  flex-direction: ${(props) => props.direction};
+  width: ${(props) => props.width};
+  margin-bottom: ${(props) => props.marginBottom};
+  margin-top: ${(props) => props.marginBottom};
+  align-items: flex-start;
+`
+
+const Text = styled.p`
+  font-size: ${(props) => props.size};
+  margin-left: 15px;
+  color: ${(props) => props.color};
 `
 
 const ManageRequests = (props) => {
 
   const types = ["Sobrecupo"]
   const [requests, setRequests] = React.useState([])
-  const user = useContext(UserContext)
+
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const onClickSearch = async () => {
     setRequests((await awsHelper.getAllRequests()).Items)
   }
 
   const onClickAccept = async (id, requester_id, courseID) => {
-    console.log(id)
+
     const bodyUpdateRequest = {
       id: id,
       state: "aprobado",
@@ -89,7 +133,18 @@ const ManageRequests = (props) => {
       courseID: courseID
     }
 
-    await awsHelper.updateRequest(bodyUpdateRequest)
+    await awsHelper.updateRequest(bodyUpdateRequest).then(response => {
+      const bodyPutStudentInCourseGroup = {
+        requester_id: requester_id,
+        courseID: courseID
+      }
+      awsHelper.putStudentInCourseGroup(bodyPutStudentInCourseGroup).then(res => {
+        console.log("response after putStudnet In courseGroup: |", res)
+      })
+
+    })
+    handleOpen()
+
 
   }
 
@@ -99,6 +154,7 @@ const ManageRequests = (props) => {
       state: "rechazado"
     }
     await awsHelper.updateRequest(body)
+
   }
 
   useEffect(() => {
@@ -108,24 +164,30 @@ const ManageRequests = (props) => {
   return (
     <SectionContainer>
       <h3>Filtrar por:</h3>
-
-      <RequestsSearchTable>
-
-        <tr>
-          <th>Tipo</th>
-          <td><Dropdown>
-            {types.map(type => <option>{type}</option>
-            )}
-          </Dropdown>
-          </td>
-        </tr>
-
-      </RequestsSearchTable>
-      <Button withIcon solid onClick={onClickSearch}>
-        <i className="material-icons-round">search</i>
-                    Buscar
-            </Button>
-
+      <Div
+        width="100%"
+        direction="row"
+      >
+        <RequestsSearchTable>
+          <Div
+            width="30%"
+            direction="column">
+            <th><Text size="19px">Tipo</Text></th>
+            <td><Dropdown
+              marginLeft="15px">
+              {types.map(type => <option>{type}</option>
+              )}
+            </Dropdown>
+            </td>
+          </Div>
+        </RequestsSearchTable>
+        <Button
+          marginTop="65px"
+          withIcon solid onClick={onClickSearch}>
+          <i className="material-icons-round">search</i>
+                      Buscar
+        </Button>
+      </Div>
       <RequestsBody>
 
         <RequestsContainer>
@@ -141,10 +203,27 @@ const ManageRequests = (props) => {
                 <Button solid onClick={e => onClickAccept(request.id, request.requester_id, request.courseID)}>Aceptar</Button>
                 <Button solid onClick={e => onClickDeny(request.id)}>Rechazar</Button>
               </RequestsTable>
+
+              <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                className={classes.modal}
+                open={open}
+                onClose={handleClose}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                  timeout: 500,
+                }}
+              >
+                <Fade in={open}>
+                  <div className={classes.paper}>
+                    <h1 id="transition-modal-title">Exito!</h1>
+                  </div>
+                </Fade>
+              </Modal>
             </CourseCard>
-
           ))}
-
         </RequestsContainer>
       </RequestsBody>
 

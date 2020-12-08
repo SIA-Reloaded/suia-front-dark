@@ -6,6 +6,7 @@ const Dropdown = styled.select`
   height: ${(props) => props.height || "30px"};
   padding: 4px 12px ;
   width:${(props) => props.width || "auto"};
+  margin-left: ${(props) => props.marginLeft};
 `;
 
 export default Dropdown;

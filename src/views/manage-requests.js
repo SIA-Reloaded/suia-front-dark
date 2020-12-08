@@ -21,7 +21,7 @@ const CourseCard = styled.div`
   margin-bottom: 0px;
   background-color: ${(props) => props.theme.colors.gray[4]};
   padding: 5px;
-  height: 250px;
+  align-self: start;
   border-radius: 15px;
   h4 {
     margin: 0;
@@ -31,22 +31,21 @@ const CourseCard = styled.div`
 `
 
 const RequestsSearchTable = styled.table`
-    width: 40%;
+    width: 20%;
     text-align: center;
 
     tr {
         td {
             &:not(:last-child) {
-            padding: 15px 10px 15px 0;
+            padding: 10px 10px 10px 0;
             }
         }
     }
 `;
 
 const RequestsTable = styled.table`
-    width: 100%;
+    width: 80%;
     text-align: center;
-
     tr {
         td {
             &:not(:last-child) {
@@ -75,6 +74,7 @@ const RequestsContainer = styled.div`
 
 `
 
+<<<<<<< HEAD
 const useStyles = makeStyles((theme) => ({
   modal: {
     display: 'flex',
@@ -90,6 +90,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
+=======
+const Div = styled.div`
+  display: flex;
+  flex-direction: ${(props) => props.direction};
+  width: ${(props) => props.width};
+  margin-bottom: ${(props) => props.marginBottom};
+  margin-top: ${(props) => props.marginBottom};
+  align-items: flex-start;
+`
+
+const Text = styled.p`
+  font-size: ${(props) => props.size};
+  margin-left: 15px;
+  color: ${(props) => props.color};
+`
+>>>>>>> 75052c456d34ff9ee334f88b6d95ec80e76f83b0
 
 const ManageRequests = (props) => {
 
@@ -141,24 +157,30 @@ const ManageRequests = (props) => {
   return (
     <SectionContainer>
       <h3>Filtrar por:</h3>
-
-      <RequestsSearchTable>
-
-        <tr>
-          <th>Tipo</th>
-          <td><Dropdown>
-            {types.map(type => <option>{type}</option>
-            )}
-          </Dropdown>
-          </td>
-        </tr>
-
-      </RequestsSearchTable>
-      <Button withIcon solid onClick={onClickSearch}>
-        <i className="material-icons-round">search</i>
-                    Buscar
-            </Button>
-
+      <Div
+      width= "100%"
+      direction = "row"
+      >
+        <RequestsSearchTable>
+          <Div 
+            width = "30%"
+            direction = "column">
+            <th><Text size="19px">Tipo</Text></th>
+            <td><Dropdown
+            marginLeft ="15px">
+              {types.map(type => <option>{type}</option>
+              )}
+            </Dropdown>
+            </td>
+          </Div>
+        </RequestsSearchTable>
+        <Button 
+        marginTop = "65px"
+        withIcon solid onClick={onClickSearch}>
+          <i className="material-icons-round">search</i>
+                      Buscar
+        </Button>
+      </Div>
       <RequestsBody>
 
         <RequestsContainer>

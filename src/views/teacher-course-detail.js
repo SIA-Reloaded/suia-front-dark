@@ -136,6 +136,11 @@ const GradesTable = styled.table`
   text-align: center;
 
   tr {
+    th {
+      &:not(:last-child) {
+        padding: 15px 10px 15px 0;
+      }
+    }
     td {
       &:not(:last-child) {
         padding: 15px 10px 15px 0;
@@ -147,8 +152,6 @@ const GradesTable = styled.table`
 
 const TeacherCourseDetail = (props) => {
   const [course, setCourse] = React.useState(undefined);
-  const [teacher, setTeacher] = React.useState(undefined);
-  const [loading, setLoading] = React.useState(false);
   const [grades, setGrades] = React.useState(undefined);
   const [lastGrades, setLastGrades] = React.useState(undefined);
   const [downloadTemplateModalIsOpen,setDownloadTemplateIsOpen] = React.useState(false);
@@ -196,8 +199,7 @@ const TeacherCourseDetail = (props) => {
   )
 
   React.useEffect(
-    () => {
-      setLoading(false);
+    () => {      
       if (course) {
         getStudents();
         getGrades();
@@ -206,8 +208,7 @@ const TeacherCourseDetail = (props) => {
     [course]
   );
 
-  const getCourse = async () => {
-    setLoading(true);
+  const getCourse = async () => {    
     const courseResponse = await awsHelper.getGroup(props.match.params.courseID);
     setCourse(courseResponse);
   }
@@ -227,13 +228,16 @@ const TeacherCourseDetail = (props) => {
   }
 
   const getGrades = async () => {
+    setLastGrades(null);
     const responseGrades = await awsHelper.getGroupGrades(props.match.params.courseID);
     setGrades(responseGrades);
-    setLastGrades(
-      responseGrades.reduce(
-        (x, y) => x.update_datetime > y.update_datetime ? x : y
-      )
-    );
+    if (responseGrades.length > 0) {
+      setLastGrades(
+        responseGrades.reduce(
+          (x, y) => x.update_datetime > y.update_datetime ? x : y
+        )
+      );
+    }
   }
 
   const onItemChange = (e) => {
@@ -257,16 +261,22 @@ const TeacherCourseDetail = (props) => {
       {header: 'Nombre', key: 'name'},
       ...gradeItems.map(
         (gradeItem) => ({
-          header: `${gradeItem.name} - ${gradeItem.percentage}%`,
+          header: `${gradeItem.name}`,
           key: gradeItem.name.replace(/\s/g, '').toLowerCase(),
-          width: `${gradeItem.name} - ${gradeItem.percentage}%`.length + padding
+          width: `${gradeItem.name}`.length + padding
         })
       ),
       {header: 'Total', key: 'total'},
     ];
+    const percentageRowArray = gradeItems.map(
+      (gradeItem) => [gradeItem.name.replace(/\s/g, '').toLowerCase(), gradeItem.percentage/100]
+    );
+    sheet.addRow(
+      Object.fromEntries(percentageRowArray)
+    );
     let maxIDWidth=0, maxNameWidth=0;
     students.forEach((student, idx) => {
-      const currentRow = idx+2;
+      const currentRow = idx+3;
       const gradeFormulas = gradeItems.map((item, idx2) => `(${getColumnLetter(idx2+2)}${currentRow}*${parseFloat(item.percentage)/100})`);
       const name = student.basicData.firstName + ' ' + student.basicData.lastName;
       maxIDWidth = student.id.length > maxIDWidth ? student.id.length : maxIDWidth;
@@ -280,6 +290,33 @@ const TeacherCourseDetail = (props) => {
         }
       })
     });
+    sheet.eachRow({ includeEmpty: true }, function(row, rowNumber){
+      row.eachCell(function(cell, colNumber) {
+        cell.font = {
+          name: 'Arial',
+          family: 2,
+          bold: false,
+          size: 10,
+        };
+        if (rowNumber <= 2) {
+          row.height = 20;
+          cell.font = {
+            name: 'Arial',
+            family: 2,
+            bold: true,
+            size: 11,
+          } 
+          cell.alignment = {
+            vertical: 'middle', horizontal: 'center'
+          };
+          if (rowNumber === 2) {
+            cell.numFmt = '0.00%';
+          }
+        } else if (colNumber >= 3) {
+          cell.numFmt = '';
+        }
+      });
+    });
     sheet.getColumn('id').width = maxIDWidth + padding;
     sheet.getColumn('name').width = maxNameWidth + padding;
     workbook.xlsx.writeBuffer().then(function (data) {
@@ -289,7 +326,7 @@ const TeacherCourseDetail = (props) => {
       const blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
       const url = window.URL.createObjectURL(blob);
       a.href = url;
-      a.download = "grades.xslx";
+      a.download = `grades-${ course.name.toLowerCase().split(' ').join('-') }.xslx`;
       a.click();
       window.URL.revokeObjectURL(url);
       closeDownloadTemplateModal();
@@ -325,16 +362,20 @@ const TeacherCourseDetail = (props) => {
                     const rowGrade = student.grades.find(
                       (grade) => grade.grade_id === item.id
                     );
-                    return acc + ((item.percentage/100)*rowGrade.grade)
+                    if (rowGrade) {
+                      return acc + item.percentage*rowGrade.grade
+                    }
                   },
                   0
-                )
+                ).toFixed(3)
               );
             } else {
               const rowGrade = student.grades.find(
                 (grade) => grade.grade_id === tableRow
               );
-              studentRow.push(rowGrade.grade)
+              if (rowGrade) {
+                studentRow.push(rowGrade.grade)
+              }
             }
           }
         );
@@ -351,7 +392,7 @@ const TeacherCourseDetail = (props) => {
           <th>Nombre</th>
           {
             lastGrades.grade_items.map(
-              (item) => <th>{item.label} - {item.percentage}%</th>
+              (item) => <th>{item.label} - {item.percentage*100}%</th>
             )
           }
           <th>Total</th>
@@ -383,47 +424,63 @@ const TeacherCourseDetail = (props) => {
       wb.xlsx.load(buffer).then(async workbook => {
         let grade_items = [];
         let grades = [];
-        let grades_mapper = [];
+        let totalIndex;
+        const firstItemIdx = 3;
         workbook.eachSheet((sheet, id) => {
           sheet.eachRow((row, rowIndex) => {
-            console.log(rowIndex);
             if(rowIndex === 1) {
-              const totalIndex = row.values.indexOf('Total');
-              const items_header = row.values.slice(3, totalIndex);
-              grade_items = items_header.map(
-                (item) => {
-                  console.log(item);
-                  const parts = item.split(' - ');
-                  console.log(parts);
-                  const id = uuid.v1();
-                  grades_mapper[row.values.indexOf(item)] = id;
-                  return {
-                    percentage: parseFloat((parts[1]).slice(0,-1)),
-                    label: parts[0],
-                    id
-                  }
+              totalIndex = row.values.indexOf('Total');
+              grade_items = row.values.slice(firstItemIdx, totalIndex).map(
+                (item, idx) => ({
+                  label: item,
+                  colNumber: idx,
+                  id: uuid.v1(),
+                })
+              );
+            } else if (rowIndex === 2) {
+              row.values.slice(firstItemIdx, totalIndex).forEach(
+                (item, idx) => {
+                  const itemIdx = grade_items.findIndex(
+                    (gradeItem) => gradeItem.colNumber === idx
+                  );
+                  grade_items[itemIdx].percentage= item;
                 }
-              )
+              );
             } else {
-              const student_grades = row.values.slice(3, grade_items.length+3);
-              grades.push({
+              const student_grades_raw = row.values.slice(firstItemIdx, totalIndex);
+              const student_grades_clean = []
+              for(let i = 0; i < student_grades_raw.length; i++) {
+                student_grades_clean.push(parseFloat(student_grades_raw[i]) || 0)
+              }
+              const student_grade_obj = {
                 student_id: row.values[1],
-                grades: student_grades.map(
-                  (grade) => ({
-                    grade_id: grades_mapper[row.values.indexOf(grade)],
-                    grade
-                  })
+                grades: student_grades_clean.map(
+                  (grade, idx) => {
+                    const gradeItem = grade_items.find(
+                      (gradeItem) => gradeItem.colNumber === idx
+                    );
+                    return {
+                      grade_id: gradeItem.id,
+                      grade: parseFloat(grade) || 0
+                    }
+                  }
                 )
-              })
+              }
+              grades.push(student_grade_obj)
             }
           })
         })
+        const clean_grade_items = grade_items.map((item) => {
+          const {colNumber, ...clean_item} = item;
+          return clean_item
+        });
         const response = await awsHelper.putStudentGrades({
           course_id: course.id,
-          grade_items,
+          grade_items: clean_grade_items,
           grades
         })
-        console.log(response);
+        getGrades();
+        closeUpdateGradesModal();
       })
     }
   }

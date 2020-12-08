@@ -134,7 +134,7 @@ const Groups = (props) => {
               {
                 pathname: props.match.url + '/detalle',
                 state: {
-                  group: row
+                  group: row,
                 }
               }
             }

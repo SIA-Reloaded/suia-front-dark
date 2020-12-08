@@ -10,6 +10,7 @@ import CalificacionDocente from './calificacion-docente';
 import TeacherCourses from './teacher-courses';
 import Overbook from './overbook';
 import TeacherCourseDetail from './teacher-course-detail';
+import StudentCourses from './student-courses';
 
 
 const DashboardContainer = styled.div`
@@ -30,6 +31,7 @@ const Dashboard = (props) => {
     <Route exact path={props.match.url + "calificacion-docente"} component={CalificacionDocente} />
     <Route exact path={props.match.url + "profesor/mis-cursos"} component={TeacherCourses} />
     <Route exact path={props.match.url + "profesor/curso/:courseID"} component={TeacherCourseDetail} />
+    <Route exact path={props.match.url + "student/mis-cursos"} component={StudentCourses} />
   </DashboardContainer>
 }
 

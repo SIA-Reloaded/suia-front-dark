@@ -5,7 +5,9 @@ import { Link } from 'react-router-dom';
 import Button from '../components/button'
 
 const GroupDetails = (props) => {
-  console.log(props)
+  const { group  } = props.location.state
+  console.log(group)
+  console.log(group.rowRepresentation)
   return <GroupDetailsContainer>
     <Grid columns={2}>
       <div>
@@ -21,32 +23,32 @@ const GroupDetails = (props) => {
     <Grid columns={2}>
       <div>
         <b className='subtitle'>Código:</b>
-        <p className='data'>202011</p>
+        <p className='data'>{group.code}</p>
 
         <b className='subtitle'>Materia:</b>
-        <p className='data'>Ingeniaría de software 1</p>
+        <p className='data'>{group.name}</p>
 
         <b className='subtitle'>Cupos:</b>
         <table className='data'>
           <tr>
             <td>Disc. obligatoria:</td>
-            <td>24</td>
+            <td>{group.capacityDistribution.disciplinaryObligatory}</td>
           </tr>
           <tr>
             <td>Disc. optativa:</td>
-            <td>6</td>
+            <td>{group.capacityDistribution.disciplinaryOptional}</td>
           </tr>
           <tr>
             <td>Fundamentación:</td>
-            <td>0</td>
+            <td>{group.capacityDistribution.freeElection}</td>
           </tr>
           <tr>
             <td>Libre elección:</td>
-            <td>3</td>
+            <td>{group.capacityDistribution.fundamentation}</td>
           </tr>
           <tr>
             <td><b>Total:</b></td>
-            <td><b>33</b></td>
+            <td><b>{group.totalCapacity}</b></td>
           </tr>
         </table>
       </div>

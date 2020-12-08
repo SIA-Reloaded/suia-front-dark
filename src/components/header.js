@@ -98,8 +98,6 @@ const Header = () => {
     setOpen((op) => !op)
   };
 
-  console.log(user)
-
   return <HeaderContainer>
     <div className='home-button'>
       <img src={IMAGES.UNAL_LOGO} alt='Universidad Nacional de Colombia' />

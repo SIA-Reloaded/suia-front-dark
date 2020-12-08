@@ -119,6 +119,7 @@ const Overbook = (props) => {
 
   const [openConfirmation, setopenConfirmation] = React.useState(false);
   const [openDenial, setopenDenial] = React.useState(false);
+  const [openOverbook, setopenOverbook] = React.useState(false);
 
   const handleopenConfirmation = () => {
     setopenConfirmation(true);
@@ -136,6 +137,14 @@ const Overbook = (props) => {
     setopenDenial(false);
   };
 
+  
+  const handleopenOverbook = () => {
+    setopenOverbook(true);
+  };
+
+  const handleCloseOverbook = () => {
+    setopenOverbook(false);
+  };
 
 
   const getCoursesByCode = async () => {
@@ -147,7 +156,7 @@ const Overbook = (props) => {
   const isCourseEnrolled = async (courseID) => {
     let value = true
     await awsHelper.getGroup(courseID).then(res => {
-      console.log("inside course:", res.students)
+      console.log("inside course enrolled:", res.students)
       if (res)
         if (!res.students.includes(user.userData.id))
           value = false
@@ -156,20 +165,39 @@ const Overbook = (props) => {
     return value
   }
 
+  const isAlreadyOverbookPetition = async (courseID) => {
+    let value = true
+    const requester_id = user.userData.id
+    await awsHelper.getRequestsByCourseAndRequesterId(courseID, requester_id).then(res => {
+      console.log("inside request:", res)
+      if (!res)
+        value = false
+    })
+
+    return value
+  }
+
   // genera la peticion de sobrecupo
   // faltaria poner el requester id (primer parametro de la funcion)
-  const onClickOverbook = async (courseId, courseName) => {
-    isCourseEnrolled(courseId).then(async isCourseEnrolledAux => {
-      if(!isCourseEnrolledAux){
-        const body = {
-          "requester_id": user.userData.id,
-          "courseID": courseId,
-          "courseName": courseName,
-          "type": "sobrecupo",
-          "state": "sin_revisar"
-        }
-        await awsHelper.putRequest(body)
-        handleopenConfirmation()
+  const onClickOverbook = async (courseID, courseName) => {
+    isCourseEnrolled(courseID).then(async isCourseEnrolledAux => {
+      if (!isCourseEnrolledAux) {
+        isAlreadyOverbookPetition(courseID).then(async isAlreadyOverbookPetitionAux => {
+          if (!isAlreadyOverbookPetitionAux) {
+            const body = {
+              "requester_id": user.userData.id,
+              "courseID": courseID,
+              "courseName": courseName,
+              "type": "sobrecupo",
+              "state": "sin_revisar"
+            }
+            await awsHelper.putRequest(body)
+            handleopenConfirmation()
+          } else {
+            console.log("ya tiene sobrecupo de este curso")
+            handleopenOverbook()
+          }
+        })
       } else {
         handleopenDenial()
       }
@@ -232,7 +260,7 @@ const Overbook = (props) => {
                   </CourseCardFooter>
                   <Button solid onClick={e => onClickOverbook(course.id, course.name)}>Solicitar sobrecupo</Button>
                   <Modal
-                    aria-labelledby="Petición de sobrecupo!"
+                    aria-labelledby="Petición exitosa!"
                     aria-describedby="espere una respuesta por parte de su coordinador."
                     className={classes.modal}
                     open={openConfirmation}
@@ -253,8 +281,8 @@ const Overbook = (props) => {
 
 
                   <Modal
-                    aria-labelledby="Petición de sobrecupo!"
-                    aria-describedby="espere una respuesta por parte de su coordinador."
+                    aria-labelledby="Error!"
+                    aria-describedby="Petición denegada"
                     className={classes.modal}
                     open={openDenial}
                     onClose={handleCloseDenial}
@@ -266,8 +294,28 @@ const Overbook = (props) => {
                   >
                     <Fade in={openDenial}>
                       <div className={classes.paper}>
-                        <h1 id="transition-modal-title">Error!</h1>
-                        <p id="transition-modal-description">Petición denegada.</p>
+                        <h1 id="transition-modal-title">Curso inscrito!</h1>
+                        <p id="transition-modal-description">Revise sus cursos inscritos.</p>
+                      </div>
+                    </Fade>
+                  </Modal>
+
+                  <Modal
+                    aria-labelledby="Petición de sobrecupo!"
+                    aria-describedby="espere una respuesta por parte de su coordinador."
+                    className={classes.modal}
+                    open={openOverbook}
+                    onClose={handleCloseOverbook}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                      timeout: 4,
+                    }}
+                  >
+                    <Fade in={openOverbook}>
+                      <div className={classes.paper}>
+                        <h1 id="transition-modal-title">Petición encontrada!</h1>
+                        <p id="transition-modal-description">Ticket en proceso de revisión. Por favor espere el resultado.</p>
                       </div>
                     </Fade>
                   </Modal>

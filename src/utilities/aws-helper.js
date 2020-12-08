@@ -79,7 +79,7 @@ export const getGroup = async (courseID) => {
 export const getCourseByCode = async (courseCode) => {
   const response = await fetch(
     `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/getCourseById?courseCode=${courseCode}`
-    );
+  );
   return await response.json();
 }
 
@@ -140,3 +140,17 @@ export const putStudentGrades = async (grades) => {
   );
   return await response.json();
 };
+
+export const getRequestsById = async (id) => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/admin/getRequest?id=${id}`
+  );
+  return await response.json();
+}
+
+export const getRequestsByCourseAndRequesterId = async (courseID, requester_id) => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/admin/getRequest?courseID=${courseID}&requester_id=${requester_id}`
+  );
+  return await response.json();
+}

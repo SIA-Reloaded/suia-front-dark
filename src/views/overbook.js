@@ -101,7 +101,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
   },
   paper: {
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: '#DFDFDF',
     border: '2px solid #000',
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
@@ -137,7 +137,7 @@ const Overbook = (props) => {
     setopenDenial(false);
   };
 
-  
+
   const handleopenOverbook = () => {
     setopenOverbook(true);
   };
@@ -166,12 +166,14 @@ const Overbook = (props) => {
   }
 
   const isAlreadyOverbookPetition = async (courseID) => {
-    let value = true
+    let value = false
     const requester_id = user.userData.id
     await awsHelper.getRequestsByCourseAndRequesterId(courseID, requester_id).then(res => {
       console.log("inside request:", res)
-      if (!res)
-        value = false
+      if (res.length > 0) {
+        value = true
+        console.log("entra con que el arreglo es mayora  cero")
+      }
     })
 
     return value
@@ -314,8 +316,8 @@ const Overbook = (props) => {
                   >
                     <Fade in={openOverbook}>
                       <div className={classes.paper}>
-                        <h1 id="transition-modal-title">Petición encontrada!</h1>
-                        <p id="transition-modal-description">Ticket en proceso de revisión. Por favor espere el resultado.</p>
+                        <h1 id="transition-modal-title">Previo ticket encontrado!</h1>
+                        <p id="transition-modal-description">Ticket se encuentra en revisión.</p>
                       </div>
                     </Fade>
                   </Modal>

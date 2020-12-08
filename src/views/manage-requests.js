@@ -81,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
   },
   paper: {
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: '#DFDFDF',
     border: '2px solid #000',
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
@@ -203,6 +203,7 @@ const ManageRequests = (props) => {
                 <Button solid onClick={e => onClickAccept(request.id, request.requester_id, request.courseID)}>Aceptar</Button>
                 <Button solid onClick={e => onClickDeny(request.id)}>Rechazar</Button>
               </RequestsTable>
+
               <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
@@ -217,7 +218,7 @@ const ManageRequests = (props) => {
               >
                 <Fade in={open}>
                   <div className={classes.paper}>
-                    <h1 id="transition-modal-title">Confirmación de sobrecupo</h1>
+                    <h1 id="transition-modal-title">Exito!</h1>
                   </div>
                 </Fade>
               </Modal>

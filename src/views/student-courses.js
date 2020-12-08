@@ -124,12 +124,12 @@ const StudentCourses = (props) => {
           rows.map(row => {
             return <tr>
 
-          {row.rowRepresentation1.map((data, i) => <td key={data} >{data}</td>)}
-        </tr>
-              }
-            )
+              {row.rowRepresentation1.map((data, i) => <td key={data} >{data}</td>)}
+            </tr>
           }
-        </tbody>
+          )
+        }
+      </tbody>
     </GroupsTable>}
   </div>
 

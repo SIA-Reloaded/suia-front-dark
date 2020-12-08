@@ -74,23 +74,6 @@ const RequestsContainer = styled.div`
 
 `
 
-<<<<<<< HEAD
-const useStyles = makeStyles((theme) => ({
-  modal: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  paper: {
-    backgroundColor: theme.palette.background.paper,
-    border: '2px solid #000',
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-  },
-}));
-
-
-=======
 const Div = styled.div`
   display: flex;
   flex-direction: ${(props) => props.direction};
@@ -105,7 +88,6 @@ const Text = styled.p`
   margin-left: 15px;
   color: ${(props) => props.color};
 `
->>>>>>> 75052c456d34ff9ee334f88b6d95ec80e76f83b0
 
 const ManageRequests = (props) => {
 

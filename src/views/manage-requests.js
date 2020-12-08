@@ -1,11 +1,15 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import SectionContainer from '../components/section-container'
 import Dropdown from './../components/drop-down'
 import Button from './../components/button'
 import * as awsHelper from './../utilities/aws-helper'
 import styled from 'styled-components'
+import { makeStyles } from '@material-ui/core/styles';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
 
-import { UserContext } from '../providers/user-provider'
+
 
 
 const CourseCard = styled.div`
@@ -68,20 +72,47 @@ const RequestsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   padding-top: 10px;
+
 `
+
+const useStyles = makeStyles((theme) => ({
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  paper: {
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
+}));
+
+
 
 const ManageRequests = (props) => {
 
   const types = ["Sobrecupo"]
   const [requests, setRequests] = React.useState([])
-  const user = useContext(UserContext)
+
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const onClickSearch = async () => {
     setRequests((await awsHelper.getAllRequests()).Items)
   }
 
   const onClickAccept = async (id, requester_id, courseID) => {
-    console.log(id)
+    
     const bodyUpdateRequest = {
       id: id,
       state: "aprobado",
@@ -90,6 +121,7 @@ const ManageRequests = (props) => {
     }
 
     await awsHelper.updateRequest(bodyUpdateRequest)
+    handleOpen()
 
   }
 
@@ -99,6 +131,7 @@ const ManageRequests = (props) => {
       state: "rechazado"
     }
     await awsHelper.updateRequest(body)
+    
   }
 
   useEffect(() => {
@@ -141,10 +174,26 @@ const ManageRequests = (props) => {
                 <Button solid onClick={e => onClickAccept(request.id, request.requester_id, request.courseID)}>Aceptar</Button>
                 <Button solid onClick={e => onClickDeny(request.id)}>Rechazar</Button>
               </RequestsTable>
+              <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                className={classes.modal}
+                open={open}
+                onClose={handleClose}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                  timeout: 500,
+                }}
+              >
+                <Fade in={open}>
+                  <div className={classes.paper}>
+                    <h1 id="transition-modal-title">Confirmación de sobrecupo</h1>
+                  </div>
+                </Fade>
+              </Modal>
             </CourseCard>
-
           ))}
-
         </RequestsContainer>
       </RequestsBody>
 

@@ -125,7 +125,7 @@ const ManageRequests = (props) => {
   }
 
   const onClickAccept = async (id, requester_id, courseID) => {
-    
+
     const bodyUpdateRequest = {
       id: id,
       state: "aprobado",
@@ -133,8 +133,18 @@ const ManageRequests = (props) => {
       courseID: courseID
     }
 
-    await awsHelper.updateRequest(bodyUpdateRequest)
+    await awsHelper.updateRequest(bodyUpdateRequest).then(response => {
+      const bodyPutStudentInCourseGroup = {
+        requester_id: requester_id,
+        courseID: courseID
+      }
+      awsHelper.putStudentInCourseGroup(bodyPutStudentInCourseGroup).then(res => {
+        console.log("response after putStudnet In courseGroup: |", res)
+      })
+
+    })
     handleOpen()
+
 
   }
 
@@ -144,7 +154,7 @@ const ManageRequests = (props) => {
       state: "rechazado"
     }
     await awsHelper.updateRequest(body)
-    
+
   }
 
   useEffect(() => {
@@ -155,25 +165,25 @@ const ManageRequests = (props) => {
     <SectionContainer>
       <h3>Filtrar por:</h3>
       <Div
-      width= "100%"
-      direction = "row"
+        width="100%"
+        direction="row"
       >
         <RequestsSearchTable>
-          <Div 
-            width = "30%"
-            direction = "column">
+          <Div
+            width="30%"
+            direction="column">
             <th><Text size="19px">Tipo</Text></th>
             <td><Dropdown
-            marginLeft ="15px">
+              marginLeft="15px">
               {types.map(type => <option>{type}</option>
               )}
             </Dropdown>
             </td>
           </Div>
         </RequestsSearchTable>
-        <Button 
-        marginTop = "65px"
-        withIcon solid onClick={onClickSearch}>
+        <Button
+          marginTop="65px"
+          withIcon solid onClick={onClickSearch}>
           <i className="material-icons-round">search</i>
                       Buscar
         </Button>

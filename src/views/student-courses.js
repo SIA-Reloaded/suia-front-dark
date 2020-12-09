@@ -4,6 +4,8 @@ import styled from 'styled-components'
 import * as awsHelper from "../utilities/aws-helper";
 import { UserContext } from '../providers/user-provider';
 import Group from '../models/group';
+import Button from './../components/button'
+
 
 const GroupsTable = styled.table`
   width: 100%;
@@ -38,9 +40,17 @@ const StudentCourses = (props) => {
 
   React.useEffect(
     () => {
-      getStudentCourses();
+      user.updateUserData(user.email)
     },
     []
+  )
+
+  React.useEffect(
+    () => {
+      console.log(user.userData)
+      getStudentCourses();
+    },
+    [user]
   )
 
   React.useEffect(
@@ -62,7 +72,8 @@ const StudentCourses = (props) => {
 
   const getStudentCourses = async () => {
     const coursesId = user.userData.current_courses
-    console.log(coursesId)
+
+    console.log(user)
     setStudentCoursesList(coursesId)
   }
 
@@ -75,10 +86,12 @@ const StudentCourses = (props) => {
     )
 
     const responseCourses = await Promise.all(coursesPromises);
+    console.log(responseCourses)
     setCoursesGroup(responseCourses)
   }
 
   const getRows = async () => {
+
     const rows = coursesGroup.map((group) => new Group(
       group.id,
       group.name,
@@ -89,13 +102,24 @@ const StudentCourses = (props) => {
       group.classroom,
       group.teacher
     ))
+    console.log(rows)
     setRows(rows)
+  }
+
+  const test = () => {
+    console.log("test", user)
+    console.log(user.email)
+    user.updateUserData(user.email)
   }
 
   return <div>
     <Text
       size="20px"
     >Cursos inscritos</Text>
+    <Button
+      onClick={test}
+    ><i className="material-icons-round">sync</i></Button>
+
     {studentCoursesList.length > 0 && <GroupsTable>
       <thead>
         <tr>

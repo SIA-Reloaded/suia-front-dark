@@ -154,3 +154,10 @@ export const getRequestsByCourseAndRequesterId = async (courseID, requester_id) 
   );
   return await response.json();
 }
+
+export const getUser = async (userIdentity) => {
+  const response = await fetch(
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/system/getUserData/${userIdentity}`
+  );
+  return await response.json();
+}

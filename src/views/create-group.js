@@ -115,7 +115,7 @@ const CreateGroup = (props) => {
       },
       1,
       schedule,
-      "Ingeniería - 401",
+      "Ingeniería - 402",
       [],
       []      
     );

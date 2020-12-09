@@ -12,12 +12,10 @@ import Overbook from './overbook';
 import TeacherCourseDetail from './teacher-course-detail';
 import StudentCourses from './student-courses';
 
-
 const DashboardContainer = styled.div`
   display: flex;
   height: calc(100% - 80px);
   width: 100%;
-
 `
 
 const Dashboard = (props) => {

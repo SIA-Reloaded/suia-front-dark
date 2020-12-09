@@ -3,7 +3,6 @@ import styled from "styled-components";
 import Input from "../components/input";
 import Button from "../components/button.js";
 import GroupModel from "../models/group";
-import { createGroup } from "../utilities/aws-helper";
 
 import * as awsHelper from '../utilities/aws-helper';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -118,10 +117,10 @@ const CreateGroup = (props) => {
       schedule,
       "Ingeniería - 401",
       [],
-      null
+      []      
     );
 
-    await createGroup(group);
+    await awsHelper.createGroup(group);
     setMustNavigate(true)
   };
 

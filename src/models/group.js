@@ -8,7 +8,7 @@ export default class Group {
     schedule,
     classroom,
     students,
-    teacher
+    teachers
   ) {
     this.id = id;
     this.name = name;
@@ -18,18 +18,18 @@ export default class Group {
     this.schedule = schedule;
     this.classroom = classroom;
     this.students = students;
-    this.teacher = teacher;
+    this.teachers = teachers;
   }
 
   get rowRepresentation() {
     console.log(this.code)
-    console.log(this.teacher?.name || 'No asignado')
+    console.log(this.teachers?.name || 'No asignado')
     return [
       this.code,
       this.name,
       this.group,
       this.scheduleStringRepresentation,
-      this.teacher?.name || 'No asignado',
+      this.teachers?.name || 'No asignado',
       this.totalCapacity,
       this.students?.length || 0,
     ];
@@ -37,13 +37,13 @@ export default class Group {
 
   get rowRepresentation1() {
     console.log(this.code)
-    console.log(this.teacher?.name || 'No asignado')
+    console.log(this.teachers?.name || 'No asignado')
     
     return [
       this.code,
       this.group,
       this.name,
-      this.teacher?.name || 'No asignado',
+      this.teachers?.name || 'No asignado',
       this.classroom,
       this.scheduleStringRepresentation,
       [],
@@ -78,14 +78,10 @@ export default class Group {
       name: this.name,
       code: this.code,
       capacityDistribution: this.capacityDistribution,
-      group: this.group,
       schedule: this.schedule,
       classroom: this.classroom,
-      students: [],
-      teacher: {
-        name: "Alejandro Díaz",
-        id: 12341234,
-      },
+      students: this.students || [],
+      teachers: this.teachers || [],
     };
   }
 }

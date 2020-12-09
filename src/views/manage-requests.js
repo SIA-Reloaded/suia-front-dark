@@ -13,7 +13,7 @@ import Fade from '@material-ui/core/Fade';
 
 
 const CourseCard = styled.div`
-  flex: 0 0 30%;
+  
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -37,7 +37,7 @@ const RequestsSearchTable = styled.table`
     tr {
         td {
             &:not(:last-child) {
-            padding: 10px 10px 10px 0;
+            padding: 10px 0px 10px 0px;
             }
         }
     }
@@ -49,7 +49,7 @@ const RequestsTable = styled.table`
     tr {
         td {
             &:not(:last-child) {
-            padding: 15px 10px 15px 0;
+            padding: 15px 0px 15px 0px;
             }
         }
     }
@@ -199,9 +199,12 @@ const ManageRequests = (props) => {
                 <tr><h4>Estado: </h4>{request.state}</tr>
                 <tr><h4>Tipo: </h4>{request.type}</tr>
                 <tr><h4>Curso: </h4>{request.courseName}</tr>
+              </RequestsTable>
+              <Div
+                direction="row">
                 <Button solid onClick={e => onClickAccept(request.id, request.requester_id, request.courseID, request.username)}>Aceptar</Button>
                 <Button solid onClick={e => onClickDeny(request.id)}>Rechazar</Button>
-              </RequestsTable>
+              </Div>
 
               <Modal
                 aria-labelledby="transition-modal-title"

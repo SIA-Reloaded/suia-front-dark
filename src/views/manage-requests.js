@@ -44,7 +44,7 @@ const RequestsSearchTable = styled.table`
 `;
 
 const RequestsTable = styled.table`
-    width: 80%;
+    width: 100%;
     text-align: center;
     tr {
         td {
@@ -96,6 +96,16 @@ const Div = styled.div`
   margin-bottom: ${(props) => props.marginBottom};
   margin-top: ${(props) => props.marginBottom};
   align-items: flex-start;
+`
+
+const DivButton = styled.div`
+  display: flex;
+  flex-direction: ${(props) => props.direction};
+  width: ${(props) => props.width};
+  margin-bottom: ${(props) => props.marginBottom};
+  margin-top: ${(props) => props.marginBottom};
+  align-items: center;
+  justify-content: center;
 `
 
 const Text = styled.p`
@@ -200,11 +210,11 @@ const ManageRequests = (props) => {
                 <tr><h4>Tipo: </h4>{request.type}</tr>
                 <tr><h4>Curso: </h4>{request.courseName}</tr>
               </RequestsTable>
-              <Div
+              <DivButton
                 direction="row">
                 <Button solid onClick={e => onClickAccept(request.id, request.requester_id, request.courseID, request.username)}>Aceptar</Button>
                 <Button solid onClick={e => onClickDeny(request.id)}>Rechazar</Button>
-              </Div>
+              </DivButton>
 
               <Modal
                 aria-labelledby="transition-modal-title"

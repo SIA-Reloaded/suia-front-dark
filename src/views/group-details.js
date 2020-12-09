@@ -3,11 +3,15 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
 import Button from '../components/button'
+import { UserContext } from '../providers/user-provider';
 
 const GroupDetails = (props) => {
-  const { group  } = props.location.state
+  const { group } = props.location.state
+  const user = React.useContext(UserContext)
+
   console.log(group)
   console.log(group.rowRepresentation)
+
   return <GroupDetailsContainer>
     <Grid columns={2}>
       <div>
@@ -15,8 +19,11 @@ const GroupDetails = (props) => {
       </div>
 
       <div className='buttons'>
-        <Button alt>Eliminar</Button>
-        <Button alt>Editar</Button>
+        {user.currentRole !== 'PROFESSOR' && <>
+          <Button alt>Eliminar</Button>
+          <Button alt>Editar</Button>
+        </>}
+
       </div>
     </Grid>
 

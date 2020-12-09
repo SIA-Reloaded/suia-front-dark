@@ -78,10 +78,6 @@ const SideBar = (props) => {
             <i className="material-icons-round">question_answer</i>
             Solicitudes
           </StyledLink>
-          <StyledLink className={props.location.pathname === '/grupos' ? 'active' : ''} to={props.match.url + 'grupos'}>
-            <i className="material-icons-round">group_work</i>
-            Grupos
-          </StyledLink>
           <StyledLink className={props.location.pathname === '/student/mis-cursos' ? 'active' : ''} to={props.match.url + 'student/mis-cursos'}>
             <i className="material-icons-round">class</i>
             Mis cursos

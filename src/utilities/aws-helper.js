@@ -26,11 +26,12 @@ export const getCourses = async () => {
 };
 
 export const createGroup = async (group) => {
+  console.log(group.groupJson)
   const response = await fetch(
     "https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/admin/createCourseGroup",
     {
       method: "POST",
-      body: JSON.stringify(group),
+      body: JSON.stringify(group.groupJson),
     }
   );
   return await response.json();

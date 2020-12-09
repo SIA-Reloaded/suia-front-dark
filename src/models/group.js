@@ -7,8 +7,8 @@ export default class Group {
     group,
     schedule,
     classroom,
-    students,
-    teacher
+    studentsUserNames,
+    teachersUsernames
   ) {
     this.id = id;
     this.name = name;
@@ -17,33 +17,33 @@ export default class Group {
     this.group = group;
     this.schedule = schedule;
     this.classroom = classroom;
-    this.students = students;
-    this.teacher = teacher;
+    this.studentsUserNames = studentsUserNames;
+    this.teachersUsernames = teachersUsernames;
   }
 
   get rowRepresentation() {
     console.log(this.code)
-    console.log(this.teacher?.name || 'No asignado')
+    console.log(this.teachersUsernames?.name || 'No asignado')
     return [
       this.code,
       this.name,
       this.group,
       this.scheduleStringRepresentation,
-      this.teacher?.name || 'No asignado',
+      this.teachersUsernames?.name || 'No asignado',
       this.totalCapacity,
-      this.students?.length || 0,
+      this.studentsUserNames?.length || 0,
     ];
   }
 
   get rowRepresentation1() {
     console.log(this.code)
-    console.log(this.teacher?.name || 'No asignado')
+    console.log(this.teachersUsernames[0].name || 'No asignado')
     
     return [
       this.code,
       this.group,
       this.name,
-      this.teacher?.name || 'No asignado',
+      this.teachersUsernames[0].name || 'No asignado',
       this.classroom,
       this.scheduleStringRepresentation,
       [],
@@ -78,14 +78,10 @@ export default class Group {
       name: this.name,
       code: this.code,
       capacityDistribution: this.capacityDistribution,
-      group: this.group,
       schedule: this.schedule,
       classroom: this.classroom,
-      students: [],
-      teacher: {
-        name: "Alejandro Díaz",
-        id: 12341234,
-      },
+      studentsUserNames: this.studentsUserNames || [],
+      teachersUsernames: this.teachersUsernames || [],
     };
   }
 }

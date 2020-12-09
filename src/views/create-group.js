@@ -113,13 +113,14 @@ const CreateGroup = (props) => {
         fundamentation: parseInt(fund),
         freeElection: parseInt(libre),
       },
-      1,
+      null,
       schedule,
       "Ingeniería - 402",
       ['aldiazve'],
-      []      
+      []
     );
 
+    console.log(group )
     console.log(group.groupJson )
 
     await awsHelper.createGroup(group);

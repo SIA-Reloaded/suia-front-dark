@@ -74,6 +74,8 @@ export default class Group {
   }
 
   get groupJson() {
+    console.log(this.studentsUserNames)
+    console.log(this.teachersUsernames)
     return {
       name: this.name,
       code: this.code,

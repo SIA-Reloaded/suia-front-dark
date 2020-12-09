@@ -116,9 +116,11 @@ const CreateGroup = (props) => {
       1,
       schedule,
       "Ingeniería - 402",
-      [],
+      ['aldiazve'],
       []      
     );
+
+    console.log(group.groupJson )
 
     await awsHelper.createGroup(group);
     setMustNavigate(true)

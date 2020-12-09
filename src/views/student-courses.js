@@ -100,25 +100,18 @@ const StudentCourses = (props) => {
       group.group,
       group.schedule,
       group.classroom,
-      group.teacher
+      group.studentsUserNames,
+      group.teachersUsernames,
+
     ))
     console.log(rows)
     setRows(rows)
-  }
-
-  const test = () => {
-    console.log("test", user)
-    console.log(user.email)
-    user.updateUserData(user.email)
   }
 
   return <div>
     <Text
       size="20px"
     >Cursos inscritos</Text>
-    <Button
-      onClick={test}
-    ><i className="material-icons-round">sync</i></Button>
 
     {studentCoursesList.length > 0 && <GroupsTable>
       <thead>
@@ -144,13 +137,9 @@ const StudentCourses = (props) => {
         </tr>
       </thead>
       <tbody>
-        {
-          rows.map(row => {
-            return <tr>
+        {rows.length > 0 &&
 
-              {row.rowRepresentation1.map((data, i) => <td key={data} >{data}</td>)}
-            </tr>
-          }
+          rows.map(row => (<tr>  {row.rowRepresentation1.map((data, i) => <td key={data} >{data}</td>)} </tr>)
           )
         }
       </tbody>

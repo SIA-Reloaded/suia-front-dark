@@ -157,9 +157,9 @@ const CalificacionDocente = () => {
           )
       )
     ).filter(
-      (answer) => answer.questionID === question.id
+      (answer) => (answer.questionID === question.id) || (answer.questionId === question.id)
     )
-
+    
     let dataSetArr;
 
     if (question.questionType === 'options') {

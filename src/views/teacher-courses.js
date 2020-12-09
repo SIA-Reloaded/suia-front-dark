@@ -98,13 +98,12 @@ const TeacherCourses = (props) => {
   }
 
   const setSemester = (e) => {
-    console.log(e.target.value);
     setSelectedSemester(e.target.value);
   }
 
   const getTeacherGroups = async () => {
     setTeacherGroups(
-      await awsHelper.getTeacherGroups(user.userData.id)
+      await awsHelper.getTeacherGroups(user.userData.username)
     )
   }
 
@@ -138,7 +137,7 @@ const TeacherCourses = (props) => {
               <Link to={`/profesor/curso/${course.id}`}><h3>{course.name}</h3></Link>
               <CourseCardFooter>
                 <p className="groups">2 grupos</p>
-                <p className="students">{course.students.length} estudiantes</p>
+                <p className="students">{course.studentsUserNames.length} estudiantes</p>
                 <p className="code">{course.code}</p>
               </CourseCardFooter>
             </CourseCard>

@@ -156,10 +156,12 @@ const Overbook = (props) => {
   const isCourseEnrolled = async (courseID) => {
     let value = true
     await awsHelper.getGroup(courseID).then(res => {
-      console.log("inside course enrolled:", res.students)
-      if (res)
-        if (!res.students.includes(user.userData.id))
+      console.log("inside course enrolled:", res, "| user", user.userData.username)
+      if (res) {
+        if (!res.studentsUserNames.includes(user.userData.username)) {
           value = false
+        }
+      }
     })
 
     return value
@@ -182,11 +184,15 @@ const Overbook = (props) => {
   // genera la peticion de sobrecupo
   // faltaria poner el requester id (primer parametro de la funcion)
   const onClickOverbook = async (courseID, courseName) => {
+    console.log(user)
     isCourseEnrolled(courseID).then(async isCourseEnrolledAux => {
       if (!isCourseEnrolledAux) {
         isAlreadyOverbookPetition(courseID).then(async isAlreadyOverbookPetitionAux => {
           if (!isAlreadyOverbookPetitionAux) {
             const body = {
+              "username": user.userData.username,
+              "firstName": user.userData.basicData.firstName,
+              "lastName": user.userData.basicData.lastName,
               "requester_id": user.userData.id,
               "courseID": courseID,
               "courseName": courseName,
@@ -196,7 +202,6 @@ const Overbook = (props) => {
             await awsHelper.putRequest(body)
             handleopenConfirmation()
           } else {
-            console.log("ya tiene sobrecupo de este curso")
             handleopenOverbook()
           }
         })

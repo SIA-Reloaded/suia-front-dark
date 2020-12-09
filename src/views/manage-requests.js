@@ -13,7 +13,7 @@ import Fade from '@material-ui/core/Fade';
 
 
 const CourseCard = styled.div`
-  flex: 0 0 30%;
+  
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -37,19 +37,19 @@ const RequestsSearchTable = styled.table`
     tr {
         td {
             &:not(:last-child) {
-            padding: 10px 10px 10px 0;
+            padding: 10px 0px 10px 0px;
             }
         }
     }
 `;
 
 const RequestsTable = styled.table`
-    width: 80%;
+    width: 100%;
     text-align: center;
     tr {
         td {
             &:not(:last-child) {
-            padding: 15px 10px 15px 0;
+            padding: 15px 0px 15px 0px;
             }
         }
     }
@@ -98,6 +98,16 @@ const Div = styled.div`
   align-items: flex-start;
 `
 
+const DivButton = styled.div`
+  display: flex;
+  flex-direction: ${(props) => props.direction};
+  width: ${(props) => props.width};
+  margin-bottom: ${(props) => props.marginBottom};
+  margin-top: ${(props) => props.marginBottom};
+  align-items: center;
+  justify-content: center;
+`
+
 const Text = styled.p`
   font-size: ${(props) => props.size};
   margin-left: 15px;
@@ -124,7 +134,7 @@ const ManageRequests = (props) => {
     setRequests((await awsHelper.getAllRequests()).Items)
   }
 
-  const onClickAccept = async (id, requester_id, courseID) => {
+  const onClickAccept = async (id, requester_id, courseID, username) => {
 
     const bodyUpdateRequest = {
       id: id,
@@ -135,6 +145,7 @@ const ManageRequests = (props) => {
 
     await awsHelper.updateRequest(bodyUpdateRequest).then(response => {
       const bodyPutStudentInCourseGroup = {
+        username: username,
         requester_id: requester_id,
         courseID: courseID
       }
@@ -144,8 +155,6 @@ const ManageRequests = (props) => {
 
     })
     handleOpen()
-
-
   }
 
   const onClickDeny = async (id) => {
@@ -154,7 +163,6 @@ const ManageRequests = (props) => {
       state: "rechazado"
     }
     await awsHelper.updateRequest(body)
-
   }
 
   useEffect(() => {
@@ -196,13 +204,17 @@ const ManageRequests = (props) => {
               <RequestsTable>
                 <tr><h4>Fecha Peticion: </h4>{request.create_datetime.slice(0, 10)}</tr>
                 <tr><h4>Hora Peticion: </h4>{request.create_datetime.slice(11, -5)}</tr>
-                <tr><h4>Estudiante: </h4>{request.requester_id}</tr>
+                <tr><h4>Estudiante: </h4>{request.firstName} {request.lastName}</tr>
+                <tr><h4>Correo: </h4>{request.username}</tr>
                 <tr><h4>Estado: </h4>{request.state}</tr>
                 <tr><h4>Tipo: </h4>{request.type}</tr>
                 <tr><h4>Curso: </h4>{request.courseName}</tr>
-                <Button solid onClick={e => onClickAccept(request.id, request.requester_id, request.courseID)}>Aceptar</Button>
-                <Button solid onClick={e => onClickDeny(request.id)}>Rechazar</Button>
               </RequestsTable>
+              <DivButton
+                direction="row">
+                <Button solid onClick={e => onClickAccept(request.id, request.requester_id, request.courseID, request.username)}>Aceptar</Button>
+                <Button solid onClick={e => onClickDeny(request.id)}>Rechazar</Button>
+              </DivButton>
 
               <Modal
                 aria-labelledby="transition-modal-title"

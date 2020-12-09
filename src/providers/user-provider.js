@@ -8,14 +8,29 @@ export const UserContext = createContext({ user: undefined });
 const UserProvider = (props) => {
   const [user, setUser] = useState(undefined);
 
+  const updateUserData = async (email) => {
+    if (email) {
+      const username = email.split('@')[0];
+      const userData = await getUserData(username)
+      console.log(userData)
+      setUser((usr) => {
+        const newUser = { ...usr }
+        newUser.userData = userData;
+        return newUser
+      })
+    }
+  }
+
   useEffect(() => {
     const setCurrentRole = (role) => {
       setUser((usr) => {
-        const newUser = {...usr}
+        const newUser = { ...usr }
         newUser.currentRole = role;
         return newUser
       })
     }
+
+
 
     auth.onAuthStateChanged(async userAuth => {
       if (userAuth) {
@@ -25,10 +40,13 @@ const UserProvider = (props) => {
         userAuth.userData = usrData
         userAuth.setCurrentRole = setCurrentRole
         userAuth.currentRole = usrData.roles[0]
+        userAuth.updateUserData = updateUserData
       }
       setUser(userAuth);
     });
   }, [])
+
+
 
   return (
     <UserContext.Provider value={user}>

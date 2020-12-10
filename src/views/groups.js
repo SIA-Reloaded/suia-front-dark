@@ -40,6 +40,7 @@ const Groups = (props) => {
 
   useEffect(() => {
     awsHelper.getGroups().then((response) => {
+      console.log(response)
       const rows = response.map((group) => new Group(
         group.id,
         group.name,
@@ -48,8 +49,8 @@ const Groups = (props) => {
         group.group,
         group.schedule,
         group.classroom,
-        group.students,
-        group.teacher
+        group.studentsUserNames,
+        group.teachersUsernames
       ))
       setRows(rows)
     }

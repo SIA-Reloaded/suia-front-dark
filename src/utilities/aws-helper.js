@@ -63,9 +63,9 @@ export const getRates = async (teacherID, academicCalendar) => {
   }
 }
 
-export const getTeacherGroups = async (teacherID) => {
+export const getTeacherGroups = async (username) => {
   const response = await fetch(
-    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/getCourses?teacherID=${teacherID}`
+    `https://wb1jsep2hj.execute-api.us-east-1.amazonaws.com/Prod/teachers/getCourses?username=${username}`
   );
   return await response.json();
 }

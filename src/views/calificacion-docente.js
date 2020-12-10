@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import * as awsHelper from '../utilities/aws-helper';
 import { UserContext } from '../providers/user-provider'
 import { Bar } from 'react-chartjs-2';
+import Theme from '../theme/theme';
 
 const Layout = styled.div`
     width:600px;
@@ -157,9 +158,9 @@ const CalificacionDocente = () => {
           )
       )
     ).filter(
-      (answer) => answer.questionID === question.id
+      (answer) => (answer.questionID === question.id) || (answer.questionId === question.id)
     )
-
+    
     let dataSetArr;
 
     if (question.questionType === 'options') {
@@ -187,7 +188,8 @@ const CalificacionDocente = () => {
 
     const dataset = {
       label: "Respuestas",
-      data: dataSetArr
+      data: dataSetArr,
+      backgroundColor: Theme.colors.primary
     }
 
     const data = {
@@ -195,7 +197,15 @@ const CalificacionDocente = () => {
       datasets: [dataset]
     }
 
-    return <Bar data={data} />
+    return <Bar data={data} options={{
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }}/>
 
   }
 

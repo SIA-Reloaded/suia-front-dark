@@ -214,7 +214,7 @@ const TeacherCourseDetail = (props) => {
   }
 
   const getStudents = async () => {
-    const studentsPromises = course.students.map(
+    const studentsPromises = course.studentsUserNames.map(
       (student) => awsHelper.getUserData(student)
     );
     Promise.all(studentsPromises)
@@ -585,7 +585,7 @@ const TeacherCourseDetail = (props) => {
                 <tr>
                   <td>Estudiantes:</td>
                   <td>{
-                    course.students.length <= 0
+                    course.studentsUserNames.length <= 0
                       ? "Aún no hay estudiantes en este grupo"
                       : (
                         students

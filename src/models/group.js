@@ -33,6 +33,17 @@ export default class Group {
     ];
   }
 
+  get studentGroupRowRepresentation() {
+    return [
+      this.code,
+      this.group,
+      this.name,
+      this.teachersUsernames[0] || 'No asignado',
+      this.classroom,
+      this.scheduleStringRepresentation,
+    ];
+  }
+
   get scheduleStringRepresentation() {
     let scheduleString = "";
     const spacer = ", ";

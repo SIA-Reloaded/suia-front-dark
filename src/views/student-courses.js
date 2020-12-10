@@ -47,7 +47,6 @@ const StudentCourses = (props) => {
 
   React.useEffect(
     () => {
-      console.log(user.userData)
       getStudentCourses();
     },
     [user]
@@ -72,8 +71,6 @@ const StudentCourses = (props) => {
 
   const getStudentCourses = async () => {
     const coursesId = user.userData.current_courses
-
-    console.log(user)
     setStudentCoursesList(coursesId)
   }
 
@@ -86,7 +83,6 @@ const StudentCourses = (props) => {
     )
 
     const responseCourses = await Promise.all(coursesPromises);
-    console.log(responseCourses)
     setCoursesGroup(responseCourses)
   }
 
@@ -104,9 +100,10 @@ const StudentCourses = (props) => {
       group.teachersUsernames,
 
     ))
-    console.log(rows)
     setRows(rows)
   }
+
+  console.log(rows)
 
   return <div>
     <Text
@@ -138,8 +135,7 @@ const StudentCourses = (props) => {
       </thead>
       <tbody>
         {rows.length > 0 &&
-
-          rows.map(row => (<tr>  {row.rowRepresentation1.map((data, i) => <td key={data} >{data}</td>)} </tr>)
+          rows.map(row => <tr>{row.studentGroupRowRepresentation.map((data, i) => <td key={data} >{data}</td>)} </tr>
           )
         }
       </tbody>

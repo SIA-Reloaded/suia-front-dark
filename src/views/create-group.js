@@ -86,6 +86,8 @@ const CreateGroup = (props) => {
   const [schedule, setSchedule] = useState([
     { day: "", startHours: "", endHours: "" },
   ]);
+  const [teachers, setTeachers] = useState('');
+  const [students, setStudents] = useState('');
 
   useEffect(() => {
     awsHelper.getCourses().then((data) => {
@@ -102,6 +104,15 @@ const CreateGroup = (props) => {
   }
 
   const saveGroup = async () => {
+
+    let splitedStudents = []
+    let splitedTeacher = []
+
+    if(students) splitedStudents = students.split(',')
+    if(teachers) splitedTeacher = teachers.split(',')
+
+    console.log(splitedStudents)
+
     setIsLoading(true)
     const group = new GroupModel(
       null,
@@ -116,8 +127,8 @@ const CreateGroup = (props) => {
       null,
       schedule,
       "Ingeniería - 402",
-      ['aldiazve'],
-      []
+      splitedStudents,
+      splitedTeacher
     );
 
     console.log(group )
@@ -212,7 +223,7 @@ const CreateGroup = (props) => {
           {schedule.map((row, i) => (
             <ScheduleSelect key={i} id={i} onChange={onSelectChange}></ScheduleSelect>
           ))}
-          <Button
+          <Button 
             alt
             onClick={() => setSchedule([...schedule, { day: "", hour: "" }])}
           >
@@ -222,12 +233,12 @@ const CreateGroup = (props) => {
         <div className="column">
           <h3>Participantes</h3>
           <div>
-            <h4>Profesor:</h4>
-            <Input smallBorder />
+            <h4>Profesor(es):</h4>
+            <Input smallBorder onChange={(e) => setTeachers(e.target.value)} />
           </div>
           <div>
             <h4>Estudiantes:</h4>
-            <Input smallBorder height="100px" />
+            <Input smallBorder height="100px" onChange={(e) => setStudents(e.target.value)}/>
           </div>
           <div>
             <h4>Total</h4>0

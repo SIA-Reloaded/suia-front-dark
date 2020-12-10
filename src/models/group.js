@@ -22,31 +22,14 @@ export default class Group {
   }
 
   get rowRepresentation() {
-    console.log(this.code)
-    console.log(this.teachersUsernames?.name || 'No asignado')
     return [
       this.code,
       this.name,
       this.group,
       this.scheduleStringRepresentation,
-      this.teachersUsernames?.name || 'No asignado',
+      this.teachersUsernames[0] || 'No asignado',
       this.totalCapacity,
       this.studentsUserNames?.length || 0,
-    ];
-  }
-
-  get rowRepresentation1() {
-    console.log(this.code)
-    console.log(this.teachersUsernames[0].name || 'No asignado')
-    
-    return [
-      this.code,
-      this.group,
-      this.name,
-      this.teachersUsernames[0].name || 'No asignado',
-      this.classroom,
-      this.scheduleStringRepresentation,
-      [],
     ];
   }
 
@@ -74,8 +57,6 @@ export default class Group {
   }
 
   get groupJson() {
-    console.log(this.studentsUserNames)
-    console.log(this.teachersUsernames)
     return {
       name: this.name,
       code: this.code,
